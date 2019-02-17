@@ -6,6 +6,7 @@
 #define MAIN_APPLICATION_H
 
 #define GL_SILENCE_DEPRECATION
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 

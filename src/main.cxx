@@ -70,12 +70,13 @@ GLuint loadShader(GLenum type, const std::string &filename) {
     return shaderObject;
 }
 
-// Create vertex buffer with a triangle
+// Create vertex buffer with a rectangle
 GLuint createVertexBuffer() {
     float vertices[] = {
-            -0.5f, -0.5f, 0,
-            0.5f, -0.5f, 0,
-            0, 0.5f, 0
+            0.5f,  0.5f, 0.0f,  // top right
+            0.5f, -0.5f, 0.0f,  // bottom right
+            -0.5f, -0.5f, 0.0f,  // bottom left
+            -0.5f,  0.5f, 0.0f   // top left
     };
 
     GLuint vertexBufferObject;
@@ -86,13 +87,29 @@ GLuint createVertexBuffer() {
     return vertexBufferObject;
 }
 
+// Create element buffer object
+// Using EBO allows indexed drawing to prevent storing redundant vertices when drawing complex shapes
+GLuint createElementBufferObject() {
+    unsigned int indices[] = {  // note that we start from 0!
+            0, 1, 3,   // first triangle
+            1, 2, 3    // second triangle
+    };
+
+    GLuint elementBufferObject;
+    glGenBuffers(1, &elementBufferObject);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObject);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+}
+
 // Create vertex array object
+// Using VAO allows to configure vertex attribute pointers once and for all
 GLuint createVertexArrayObject() {
     // create vertex array object
     GLuint vertexArrayObject;
     glGenVertexArrays(1, &vertexArrayObject);
     glBindVertexArray(vertexArrayObject);
     createVertexBuffer();
+    createElementBufferObject();
 
     // specify how to interpret vertex data from currently bound VBO
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
@@ -134,7 +151,6 @@ void startGameLoop(GLFWwindow* window) {
     GLuint shaderProgram = createShaderProgram();
     GLuint vao = createVertexArrayObject();
 
-
     // create application
     Application app = Application(window);
 
@@ -149,7 +165,7 @@ void startGameLoop(GLFWwindow* window) {
         // draw
         glUseProgram(shaderProgram);
         glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // update color buffers
         glfwSwapBuffers(window); // swap front and back color buffers
@@ -157,6 +173,9 @@ void startGameLoop(GLFWwindow* window) {
     }
 }
 
+// TODO: read list
+// https://learnopengl.com/Getting-started/Shaders
+// https://learnopengl.com/In-Practice/Debugging
 int main(int argc, char **argv) {
     // Create window
     initializeGLFW();
