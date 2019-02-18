@@ -2,12 +2,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <random>
-#include <fstream>
 #include <iostream>
-#include "LiteMath.h"
-#include "Application.h"
-#include "Callback.h"
-//#include "common.h"
+#include "utils/LiteMath.h"
+#include "utils/Texture.h"
+#include "core/Application.h"
+#include "core/Callback.h"
+#include "utils/Shader.h"
 #define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH 800
 #define WINDOW_TITLE "OpenGL Introduction"
@@ -40,43 +40,14 @@ int initializeGL() {
     return 0;
 }
 
-// Load shader specified by its source file and type
-GLuint loadShader(GLenum type, const std::string &filename) {
-    // read shader from file
-    std::ifstream fs(filename);
-    if (!fs.is_open()) {
-        std::cerr << "Failed to load shader file: " << filename << std::endl;
-        throw std::runtime_error("Shader missing");
-    }
-    std::string shaderText((std::istreambuf_iterator<char>(fs)), std::istreambuf_iterator<char>());
-
-    // compile shader
-    GLuint shaderObject = glCreateShader(type); // create shader object
-    const GLchar *source = shaderText.c_str();
-    glShaderSource(shaderObject, 1, &source, nullptr);
-    glCompileShader(shaderObject);
-
-    // check for compilation errors
-    GLint compilationStatus;
-    glGetShaderiv(shaderObject, GL_COMPILE_STATUS, &compilationStatus);
-
-    if (compilationStatus != GL_TRUE) {
-        GLchar infoLog[512];
-        glGetShaderInfoLog(shaderObject, 512, nullptr, infoLog);
-        std::cerr << "Shader compilation failed: " << std::endl << infoLog << std::endl;
-        throw std::runtime_error("Shader compilation failed");
-    }
-
-    return shaderObject;
-}
-
 // Create vertex buffer with a rectangle
 GLuint createVertexBuffer() {
     float vertices[] = {
-            0.5f,  0.5f, 0.0f,  // top right
-            0.5f, -0.5f, 0.0f,  // bottom right
-            -0.5f, -0.5f, 0.0f,  // bottom left
-            -0.5f,  0.5f, 0.0f   // top left
+            // positions          // colors           // texture coords
+            0.5f,   0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+            0.5f,  -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+            -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
     };
 
     GLuint vertexBufferObject;
@@ -91,14 +62,16 @@ GLuint createVertexBuffer() {
 // Using EBO allows indexed drawing to prevent storing redundant vertices when drawing complex shapes
 GLuint createElementBufferObject() {
     unsigned int indices[] = {  // note that we start from 0!
-            0, 1, 3,   // first triangle
-            1, 2, 3    // second triangle
+            0, 1, 3,
+            1, 3, 2
     };
 
     GLuint elementBufferObject;
     glGenBuffers(1, &elementBufferObject);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObject);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    return elementBufferObject;
 }
 
 // Create vertex array object
@@ -112,47 +85,23 @@ GLuint createVertexArrayObject() {
     createElementBufferObject();
 
     // specify how to interpret vertex data from currently bound VBO
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     return vertexArrayObject;
 }
 
-// Create shader program
-GLuint createShaderProgram() {
-    GLuint vertexShader = loadShader(GL_VERTEX_SHADER, "vertex.glsl");
-    GLuint fragmentShader = loadShader(GL_FRAGMENT_SHADER, "fragment.glsl");
-
-    // create shader program
-    GLuint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    // check for errors
-    GLint success;
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (success != GL_TRUE) {
-        GLchar infoLog[512];
-        glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-        std::cerr << "Shader linking failed: " << std::endl << infoLog << std::endl;
-        throw std::runtime_error("Shader linking failed");
-    }
-
-    return shaderProgram;
-}
-
 // Start game loop that ends when GLFW is signaled to close
 void startGameLoop(GLFWwindow* window) {
-
-    // load shader program and vertex array object
-    GLuint shaderProgram = createShaderProgram();
+    // create prerequisites
     GLuint vao = createVertexArrayObject();
-
-    // create application
     Application app = Application(window);
+    Shader shader = Shader("vertex.glsl", "fragment.glsl");
+    Texture texture = Texture("assets/wall.jpg");
 
     while(!glfwWindowShouldClose(window)) {
         // process input
@@ -163,9 +112,10 @@ void startGameLoop(GLFWwindow* window) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         // draw
-        glUseProgram(shaderProgram);
+        shader.use();
         glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        texture.bind();
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
         // update color buffers
         glfwSwapBuffers(window); // swap front and back color buffers

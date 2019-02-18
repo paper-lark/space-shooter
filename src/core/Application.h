@@ -1,7 +1,3 @@
-//
-// Created by Max Zhuravsky on 2019-02-17.
-//
-
 #ifndef MAIN_APPLICATION_H
 #define MAIN_APPLICATION_H
 

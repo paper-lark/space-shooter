@@ -1,7 +1,3 @@
-//
-// Created by Max Zhuravsky on 2019-02-17.
-//
-
 #include "Application.h"
 
 void Application::processInput() const {
