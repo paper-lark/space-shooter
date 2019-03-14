@@ -41,6 +41,9 @@ int initializeGL() {
     std::cout << "Version: " << glGetString(GL_VERSION) << std::endl;
     std::cout << "GLSL: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
+    // enable depth buffer
+    glEnable(GL_DEPTH_TEST);
+
     return 0;
 }
 
@@ -48,10 +51,14 @@ int initializeGL() {
 GLuint createVertexBuffer() {
     float vertices[] = {
             // positions          // colors           // texture coords
-            0.5f,   0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-            0.5f,  -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-            -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-            -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
+            0.5f,   0.5f, -0.1f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+            0.5f,  -0.5f, -0.1f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+            -0.5f, -0.5f, -0.1f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+            -0.5f,  0.5f, -0.1f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f,   // top left
+            0.5f,   0.5f,  0.1f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+            0.5f,  -0.5f,  0.1f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+            -0.5f, -0.5f,  0.1f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+            -0.5f,  0.5f,  0.1f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
     };
 
     GLuint vertexBufferObject;
@@ -67,7 +74,17 @@ GLuint createVertexBuffer() {
 GLuint createElementBufferObject() {
     unsigned int indices[] = {  // note that we start from 0!
             0, 1, 3,
-            1, 3, 2
+            1, 3, 2,
+            1, 2, 6,
+            1, 5, 6,
+            1, 5, 4,
+            1, 0, 4,
+            0, 3, 7,
+            0, 4, 7,
+            2, 6, 7,
+            2, 3, 7,
+            5, 4, 7,
+            5, 6, 7
     };
 
     GLuint elementBufferObject;
@@ -110,9 +127,28 @@ double getDeltaTime() {
 // Get transformation based on time delta
 glm::mat4 getTransformation(double delta) {
     glm::mat4 trans = glm::mat4(1.f);
-    trans = glm::scale(trans, glm::vec3(float(sin(glfwGetTime()))));
     trans = glm::rotate(trans, glm::radians(float(glfwGetTime()) * 45.f), glm::vec3(0.0, 0.0, 1.0));
     return trans;
+}
+
+// Get model matrix (local -> world)
+glm::mat4 getModelMatrix() {
+    return glm::rotate(glm::mat4(1.f), glm::radians(-55.f), glm::vec3(1.f, 0.f, 0.f));
+}
+
+// Get View matrix (world -> view)
+glm::mat4 getViewMatrix() {
+    return glm::translate(glm::mat4(1.f), glm::vec3(0.0f, 0.0f, -3.0f));
+}
+
+// Get projection matrix (view -> clip)
+glm::mat4 getProjectionMatrix() {
+    return glm::perspective(
+            glm::radians(45.0f),
+            float(Callback::windowSize[0]) / Callback::windowSize[1],
+            0.1f,
+            100.0f
+    );
 }
 
 
@@ -131,14 +167,18 @@ void startGameLoop(GLFWwindow* window) {
 
         // clear screen
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // draw
         shader.use();
         shader.setMatrix("transform", getTransformation(deltaTime));
+        shader.setMatrix("model", getModelMatrix());
+        shader.setMatrix("view", getViewMatrix());
+        shader.setMatrix("projection", getProjectionMatrix());
+
         glBindVertexArray(vao);
         texture.bind();
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
 
         // update color buffers
         glfwSwapBuffers(window); // swap front and back color buffers

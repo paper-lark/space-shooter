@@ -7,6 +7,9 @@
 class Callback {
 
 public:
+    // Current window size
+    static GLint windowSize[2];
+
     // Window resize callback
     static void windowResize(GLFWwindow* _, GLint width, GLint height);
 
