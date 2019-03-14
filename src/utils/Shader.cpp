@@ -1,6 +1,7 @@
 #include "Shader.h"
 #include <fstream>
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 // Load shader specified by its source file and type
 GLuint loadShader(GLenum type, const std::string &filename) {
@@ -70,4 +71,9 @@ void Shader::setFloat(const std::string &name, float value) const {
 
 void Shader::setInt(const std::string &name, int value) const {
     glUniform1i(glGetUniformLocation(ID, name.c_str()), value);
+}
+
+void Shader::setMatrix(const std::string &name, glm::mat4 matrix) const {
+    // TODO: is matrix copied?
+    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(matrix));
 }

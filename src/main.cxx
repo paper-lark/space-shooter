@@ -1,6 +1,9 @@
 #define GL_SILENCE_DEPRECATION
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <random>
 #include <iostream>
 #include "utils/LiteMath.h"
@@ -20,6 +23,7 @@ void initializeGLFW() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 }
 
@@ -95,6 +99,23 @@ GLuint createVertexArrayObject() {
     return vertexArrayObject;
 }
 
+// Get delta time between calls in seconds
+double getDeltaTime() {
+    static double previous = glfwGetTime();
+    double result = glfwGetTime() - previous;
+    previous += result;
+    return result;
+}
+
+// Get transformation based on time delta
+glm::mat4 getTransformation(double delta) {
+    glm::mat4 trans = glm::mat4(1.f);
+    trans = glm::scale(trans, glm::vec3(float(sin(glfwGetTime()))));
+    trans = glm::rotate(trans, glm::radians(float(glfwGetTime()) * 45.f), glm::vec3(0.0, 0.0, 1.0));
+    return trans;
+}
+
+
 // Start game loop that ends when GLFW is signaled to close
 void startGameLoop(GLFWwindow* window) {
     // create prerequisites
@@ -106,6 +127,7 @@ void startGameLoop(GLFWwindow* window) {
     while(!glfwWindowShouldClose(window)) {
         // process input
         app.processInput();
+        double deltaTime = getDeltaTime();
 
         // clear screen
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -113,6 +135,7 @@ void startGameLoop(GLFWwindow* window) {
 
         // draw
         shader.use();
+        shader.setMatrix("transform", getTransformation(deltaTime));
         glBindVertexArray(vao);
         texture.bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
@@ -121,6 +144,10 @@ void startGameLoop(GLFWwindow* window) {
         glfwSwapBuffers(window); // swap front and back color buffers
         glfwPollEvents(); // process all events
     }
+
+    // release resources
+    // TODO: release VBO and EBO
+    glDeleteVertexArrays(1, &vao);
 }
 
 // TODO: read list
