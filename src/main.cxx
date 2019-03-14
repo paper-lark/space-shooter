@@ -50,7 +50,7 @@ int initializeGL() {
 // Create vertex buffer with a rectangle
 GLuint createVertexBuffer() {
     float vertices[] = {
-            // positions          // colors           // texture coords
+            // positions           // colors           // texture coords
             0.5f,   0.5f, -0.1f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
             0.5f,  -0.5f, -0.1f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
             -0.5f, -0.5f, -0.1f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
@@ -72,7 +72,7 @@ GLuint createVertexBuffer() {
 // Create element buffer object
 // Using EBO allows indexed drawing to prevent storing redundant vertices when drawing complex shapes
 GLuint createElementBufferObject() {
-    unsigned int indices[] = {  // note that we start from 0!
+    unsigned int indices[] = {
             0, 1, 3,
             1, 3, 2,
             1, 2, 6,
@@ -116,14 +116,6 @@ GLuint createVertexArrayObject() {
     return vertexArrayObject;
 }
 
-// Get delta time between calls in seconds
-double getDeltaTime() {
-    static double previous = glfwGetTime();
-    double result = glfwGetTime() - previous;
-    previous += result;
-    return result;
-}
-
 // Get transformation based on time delta
 glm::mat4 getTransformation(double delta) {
     glm::mat4 trans = glm::mat4(1.f);
@@ -136,22 +128,6 @@ glm::mat4 getModelMatrix() {
     return glm::rotate(glm::mat4(1.f), glm::radians(-55.f), glm::vec3(1.f, 0.f, 0.f));
 }
 
-// Get View matrix (world -> view)
-glm::mat4 getViewMatrix() {
-    return glm::translate(glm::mat4(1.f), glm::vec3(0.0f, 0.0f, -3.0f));
-}
-
-// Get projection matrix (view -> clip)
-glm::mat4 getProjectionMatrix() {
-    return glm::perspective(
-            glm::radians(45.0f),
-            float(Callback::windowSize[0]) / Callback::windowSize[1],
-            0.1f,
-            100.0f
-    );
-}
-
-
 // Start game loop that ends when GLFW is signaled to close
 void startGameLoop(GLFWwindow* window) {
     // create prerequisites
@@ -163,7 +139,7 @@ void startGameLoop(GLFWwindow* window) {
     while(!glfwWindowShouldClose(window)) {
         // process input
         app.processInput();
-        double deltaTime = getDeltaTime();
+        double deltaTime = app.getDeltaTime();
 
         // clear screen
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -173,8 +149,8 @@ void startGameLoop(GLFWwindow* window) {
         shader.use();
         shader.setMatrix("transform", getTransformation(deltaTime));
         shader.setMatrix("model", getModelMatrix());
-        shader.setMatrix("view", getViewMatrix());
-        shader.setMatrix("projection", getProjectionMatrix());
+        shader.setMatrix("view", app.getViewMatrix());
+        shader.setMatrix("projection", app.getProjectionMatrix());
 
         glBindVertexArray(vao);
         texture.bind();
