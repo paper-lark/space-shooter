@@ -11,7 +11,7 @@ public:
     static GLint windowSize[2];
 
     // Window resize callback
-    static void windowResize(GLFWwindow* _, GLint width, GLint height);
+    static void windowResize(GLFWwindow*, GLint width, GLint height);
 
     // Error callback
     static void error(int code, const char* description);

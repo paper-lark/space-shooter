@@ -10,21 +10,24 @@
 
 class Application {
 private:
-    GLFWwindow *window = nullptr;
+    GLFWwindow *window;
     double previousMoment = 0.0;
     double deltaTime = 0.0;
+    const float sensitivity = 0.05f; // mouse sensitivity
+    static Application &instance;
+
 public:
     // Application camera object
-    Camera &camera;
+    Camera camera;
 
     // Constructor
-    Application(GLFWwindow *window, Camera &camera): window(window), camera(camera) {}
+    Application(GLFWwindow *window = nullptr): window(window) {}
 
     // Process keyboard input
     void processKeyboardInput();
 
     // Process mouse input
-    void processMouseInput(GLFWwindow* window, double xpos, double ypos) const;
+    void processMouseInput(GLFWwindow* window, double posX, double posY);
 
     // Update application state
     void update();
@@ -32,7 +35,15 @@ public:
     // Get delta time from previous render
     float getDeltaTime() const;
 
-};
+    // Initialize application singleton
+    static void initialize(GLFWwindow *window) {
+        Application::instance.window = window;
+    }
 
+    // Get application singleton
+    static Application &getSingleton() {
+        return Application::instance;
+    }
+};
 
 #endif //MAIN_APPLICATION_H

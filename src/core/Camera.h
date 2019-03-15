@@ -5,10 +5,11 @@
 
 
 class Camera {
-    mutable glm::vec3 position = glm::vec3(0.0f, 0.0f, 3.0f); // TODO: remove mutability
+    mutable glm::vec3 position = glm::vec3(-3.0f, 0.5f, 0.0f); // TODO: remove mutability
     float pitch = 0.f; // camera pitch in deg
     float yaw = 0.f; // camera yaw in deg
-    const float speed = 0.5f;
+    float fov = 45.f; // camera field of view
+    const float speed = 0.5f; // camera movement speed
 
 public:
     // Move camera
@@ -27,6 +28,9 @@ public:
     glm::vec3 getUp() const {
         return glm::vec3(0.f, 1.f, 0.f);
     }
+
+    // Update camera rotation
+    void updateRotation(float deltaYaw, float deltaPitch);
 };
 
 

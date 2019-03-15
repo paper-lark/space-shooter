@@ -6,7 +6,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <random>
 #include <iostream>
-#include "utils/LiteMath.h"
 #include "utils/Texture.h"
 #include "core/Application.h"
 #include "core/Callback.h"
@@ -16,7 +15,6 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_TITLE "OpenGL Introduction"
 
-using namespace LiteMath;
 
 // Initialize GLFW
 void initializeGLFW() {
@@ -173,12 +171,17 @@ int main(int argc, char **argv) {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // attach cursor to the window
 
     // Initialize application
-    Camera camera{};
-    Application app = Application(window, camera);
+    Application::initialize(window);
 
     // Register event callbacks
     glfwSetFramebufferSizeCallback(window, Callback::windowResize);
     glfwSetErrorCallback(Callback::error);
+    glfwSetCursorPosCallback(
+            window,
+            [](GLFWwindow* window, double posX, double posY) {
+                Application::getSingleton().processMouseInput(window, posX, posY);
+            }
+    );
 
     // Initialize OpenGL
     if (initializeGL() != 0) {
@@ -186,7 +189,7 @@ int main(int argc, char **argv) {
     }
 
     // Start game loop
-    startGameLoop(window, app);
+    startGameLoop(window, Application::getSingleton());
 
     // Terminate GLFW
     glfwTerminate();

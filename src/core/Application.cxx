@@ -1,5 +1,8 @@
 #include "Application.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
+
+Application& Application::instance = *(new Application());
 
 // Process keyboard input
 void Application::processKeyboardInput() {
@@ -32,8 +35,16 @@ void Application::processKeyboardInput() {
 }
 
 // Process mouse input
-void Application::processMouseInput(GLFWwindow* window, double xpos, double ypos) const {
-    // TODO: implement
+void Application::processMouseInput(GLFWwindow*, double posX, double posY) {
+    static double lastX = posX, lastY = posY;
+
+    float offsetX = float(posX - lastX) * sensitivity;
+    float offsetY = float(posY - lastY) * sensitivity;
+
+    lastX = posX;
+    lastY = posY;
+
+    camera.updateRotation(offsetX, -offsetY);
 }
 
 
