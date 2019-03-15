@@ -8,7 +8,7 @@ set(SOURCE_FILES
         src/main.cxx
         src/core/Callback.cxx src/core/Callback.h
         src/core/Application.cxx src/core/Application.h
-        src/utils/Shader.cpp src/utils/Shader.h dependencies/include/stb_image.h src/utils/Texture.cpp src/utils/Texture.h)
+        src/utils/Shader.cpp src/utils/Shader.h dependencies/include/stb_image.h src/utils/Texture.cpp src/utils/Texture.h src/core/Camera.cpp src/core/Camera.h src/core/Camera.cpp src/core/Camera.h)
 set(ADDITIONAL_INCLUDE_DIRS
         dependencies/include)
 set (CMAKE_CXX_FLAGS_DEBUG  "${CMAKE_CXX_FLAGS_DEBUG} -Wall")

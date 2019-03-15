@@ -3,32 +3,35 @@
 
 #define GL_SILENCE_DEPRECATION
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include "Callback.h"
+#include <GLFW/glfw3.h>
+#include "Camera.h"
 
 
 class Application {
 private:
     GLFWwindow *window = nullptr;
-
+    double previousMoment = 0.0;
+    double deltaTime = 0.0;
 public:
-    // Constructor
-    Application(GLFWwindow *window): window(window) {}
+    // Application camera object
+    Camera &camera;
 
-    // Process input
-    void processInput() const;
+    // Constructor
+    Application(GLFWwindow *window, Camera &camera): window(window), camera(camera) {}
+
+    // Process keyboard input
+    void processKeyboardInput();
+
+    // Process mouse input
+    void processMouseInput(GLFWwindow* window, double xpos, double ypos) const;
+
+    // Update application state
+    void update();
 
     // Get delta time from previous render
-    double getDeltaTime() const;
+    float getDeltaTime() const;
 
-    // Get projection matrix (view -> clip)
-    glm::mat4 getProjectionMatrix() const;
-
-
-    // Get View matrix (world -> view)
-    glm::mat4 getViewMatrix() const;
 };
 
 

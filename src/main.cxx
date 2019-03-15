@@ -11,6 +11,7 @@
 #include "core/Application.h"
 #include "core/Callback.h"
 #include "utils/Shader.h"
+#include "core/Camera.h"
 #define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH 800
 #define WINDOW_TITLE "OpenGL Introduction"
@@ -116,30 +117,21 @@ GLuint createVertexArrayObject() {
     return vertexArrayObject;
 }
 
-// Get transformation based on time delta
-glm::mat4 getTransformation(double delta) {
-    glm::mat4 trans = glm::mat4(1.f);
-    trans = glm::rotate(trans, glm::radians(float(glfwGetTime()) * 45.f), glm::vec3(0.0, 0.0, 1.0));
-    return trans;
-}
-
 // Get model matrix (local -> world)
 glm::mat4 getModelMatrix() {
     return glm::rotate(glm::mat4(1.f), glm::radians(-55.f), glm::vec3(1.f, 0.f, 0.f));
 }
 
 // Start game loop that ends when GLFW is signaled to close
-void startGameLoop(GLFWwindow* window) {
+void startGameLoop(GLFWwindow* window, Application &app) {
     // create prerequisites
     GLuint vao = createVertexArrayObject();
-    Application app = Application(window);
     Shader shader = Shader("vertex.glsl", "fragment.glsl");
     Texture texture = Texture("assets/wall.jpg");
 
     while(!glfwWindowShouldClose(window)) {
-        // process input
-        app.processInput();
-        double deltaTime = app.getDeltaTime();
+        // update application
+        app.update();
 
         // clear screen
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -147,10 +139,9 @@ void startGameLoop(GLFWwindow* window) {
 
         // draw
         shader.use();
-        shader.setMatrix("transform", getTransformation(deltaTime));
         shader.setMatrix("model", getModelMatrix());
-        shader.setMatrix("view", app.getViewMatrix());
-        shader.setMatrix("projection", app.getProjectionMatrix());
+        shader.setMatrix("view", app.camera.getViewMatrix());
+        shader.setMatrix("projection", app.camera.getProjectionMatrix());
 
         glBindVertexArray(vao);
         texture.bind();
@@ -179,6 +170,11 @@ int main(int argc, char **argv) {
         return -1;
     }
     glfwMakeContextCurrent(window);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // attach cursor to the window
+
+    // Initialize application
+    Camera camera{};
+    Application app = Application(window, camera);
 
     // Register event callbacks
     glfwSetFramebufferSizeCallback(window, Callback::windowResize);
@@ -190,7 +186,7 @@ int main(int argc, char **argv) {
     }
 
     // Start game loop
-    startGameLoop(window);
+    startGameLoop(window, app);
 
     // Terminate GLFW
     glfwTerminate();
