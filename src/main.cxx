@@ -190,7 +190,7 @@ void startGameLoop(GLFWwindow* window, Application &app) {
     // create textures and shaders
     Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
     Shader lightShader = Shader("light/vertex.glsl", "light/fragment.glsl");
-    Texture texture = Texture("assets/stone.jpg");
+    Texture texture = Texture("assets/marble.png");
 
     while(!glfwWindowShouldClose(window)) {
         // update application
