@@ -5,7 +5,7 @@
 
 
 class Camera {
-    mutable glm::vec3 position = glm::vec3(-3.0f, 0.5f, 0.0f); // TODO: remove mutability
+    glm::vec3 position = glm::vec3(-3.0f, 0.5f, 0.0f);
     float pitch = 0.f; // camera pitch in deg
     float yaw = 0.f; // camera yaw in deg
     float fov = 45.f; // camera field of view
@@ -27,6 +27,11 @@ public:
     // Get camera upward direction
     glm::vec3 getUp() const {
         return glm::vec3(0.f, 1.f, 0.f);
+    }
+
+    // Get camera position
+    glm::vec3 getPos() const {
+        return glm::vec3(position);
     }
 
     // Update camera rotation

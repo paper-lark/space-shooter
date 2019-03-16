@@ -49,15 +49,48 @@ int initializeGL() {
 // Create vertex buffer with a rectangle
 GLuint createVertexBuffer() {
     float vertices[] = {
-            // positions           // colors           // texture coords
-            0.5f,   0.5f, -0.1f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-            0.5f,  -0.5f, -0.1f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-            -0.5f, -0.5f, -0.1f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-            -0.5f,  0.5f, -0.1f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f,   // top left
-            0.5f,   0.5f,  0.1f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-            0.5f,  -0.5f,  0.1f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-            -0.5f, -0.5f,  0.1f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-            -0.5f,  0.5f,  0.1f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
+             // coordinates       // normal in vertex  // texture coordinates
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.00f, 0.66f,
+             0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.00f, 0.33f,
+             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.25f, 0.33f,
+             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.25f, 0.33f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.25f, 0.66f,
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.00f, 0.66f,
+
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.75f, 0.66f,
+             0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.75f, 0.33f,
+             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.50f, 0.33f,
+             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.50f, 0.33f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.50f, 0.66f,
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.75f, 0.66f,
+
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.50f, 0.66f,
+            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.25f, 0.66f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.25f, 1.00f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.25f, 1.00f,
+            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.50f, 1.00f,
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.50f, 0.66f,
+
+             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.50f, 0.33f,
+             0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.25f, 0.33f,
+             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.25f, 0.00f,
+             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.25f, 0.00f,
+             0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.50f, 0.00f,
+             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.50f, 0.33f,
+
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.00f, 0.66f,
+             0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.00f, 0.33f,
+             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.75f, 0.33f,
+             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.75f, 0.33f,
+            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.75f, 0.66f,
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.00f, 0.66f,
+
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.25f, 0.66f,
+             0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.25f, 0.33f,
+             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.50f, 0.33f,
+             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.50f, 0.33f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.50f, 0.66f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.25f, 0.66f
     };
 
     GLuint vertexBufferObject;
@@ -96,13 +129,13 @@ GLuint createElementBufferObject() {
 
 // Create vertex array object
 // Using VAO allows to configure vertex attribute pointers once and for all
-GLuint createVertexArrayObject() {
+GLuint createVertexArrayObject(GLuint vbo) {
     // create vertex array object
     GLuint vertexArrayObject;
     glGenVertexArrays(1, &vertexArrayObject);
     glBindVertexArray(vertexArrayObject);
     createVertexBuffer();
-    createElementBufferObject();
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     // specify how to interpret vertex data from currently bound VBO
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
@@ -115,17 +148,49 @@ GLuint createVertexArrayObject() {
     return vertexArrayObject;
 }
 
-// Get model matrix (local -> world)
-glm::mat4 getModelMatrix() {
-    return glm::rotate(glm::mat4(1.f), glm::radians(-55.f), glm::vec3(1.f, 0.f, 0.f));
+// Create light source VAO
+GLuint createLightArrayObject(GLuint vbo) {
+    // create vertex array object
+    GLuint lightVAO;
+    glGenVertexArrays(1, &lightVAO);
+    glBindVertexArray(lightVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    // specify how to interpret vertex data from currently bound VBO
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
+    glEnableVertexAttribArray(0);
+
+    return lightVAO;
+}
+
+// Get object model matrix (local -> world)
+glm::mat4 getObjectModelMatrix() {
+    glm::mat4 matrix = glm::mat4(1.f);
+    matrix = glm::translate(matrix, glm::vec3(0.f, 0.f, 0.f));
+    matrix = glm::rotate(matrix, glm::radians(30.f), glm::vec3(0.f, 1.f, 0.f));
+    return matrix;
+}
+
+// Get light source model matrix (local -> world)
+glm::mat4 getLightModelMatrix(glm::vec3 lightPosition) {
+    glm::mat4 matrix = glm::mat4(1.f);
+    matrix = glm::translate(matrix, lightPosition);
+    return glm::scale(matrix, glm::vec3(0.25f, 0.25f, 0.25f));
 }
 
 // Start game loop that ends when GLFW is signaled to close
 void startGameLoop(GLFWwindow* window, Application &app) {
     // create prerequisites
-    GLuint vao = createVertexArrayObject();
-    Shader shader = Shader("vertex.glsl", "fragment.glsl");
-    Texture texture = Texture("assets/wall.jpg");
+    GLuint cube = createVertexBuffer();
+    GLuint object = createVertexArrayObject(cube);
+    GLuint light = createLightArrayObject(cube);
+    glm::vec3 lightPosition = glm::vec3(-1.f, 0.95f, 1.f);
+    glm::vec3 lightColor = glm::vec3(0.66f, 0.75f, 0.90f);
+
+    // create textures and shaders
+    Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
+    Shader lightShader = Shader("light/vertex.glsl", "light/fragment.glsl");
+    Texture texture = Texture("assets/stone.jpg");
 
     while(!glfwWindowShouldClose(window)) {
         // update application
@@ -135,15 +200,28 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // draw
-        shader.use();
-        shader.setMatrix("model", getModelMatrix());
-        shader.setMatrix("view", app.camera.getViewMatrix());
-        shader.setMatrix("projection", app.camera.getProjectionMatrix());
-
-        glBindVertexArray(vao);
+        // draw object
+        objShader.use();
+        objShader.setMatrix("model", getObjectModelMatrix());
+        objShader.setMatrix("view", app.camera.getViewMatrix());
+        objShader.setMatrix("projection", app.camera.getProjectionMatrix());
+        objShader.setVec3("lightColor", lightColor);
+        objShader.setVec3("lightPos", lightPosition);
+        objShader.setVec3("viewPos", app.camera.getPos());
+        glBindVertexArray(object);
         texture.bind();
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+
+        // draw light source
+        lightShader.use();
+        lightShader.setMatrix("model", getLightModelMatrix(lightPosition));
+        lightShader.setMatrix("view", app.camera.getViewMatrix());
+        lightShader.setMatrix("projection", app.camera.getProjectionMatrix());
+        lightShader.setVec3("lightColor", lightColor);
+        glBindVertexArray(light);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
 
         // update color buffers
         glfwSwapBuffers(window); // swap front and back color buffers
@@ -151,8 +229,9 @@ void startGameLoop(GLFWwindow* window, Application &app) {
     }
 
     // release resources
-    // TODO: release VBO and EBO
-    glDeleteVertexArrays(1, &vao);
+    glDeleteVertexArrays(1, &object);
+    glDeleteVertexArrays(1, &light);
+    glDeleteBuffers(1, &cube);
 }
 
 // TODO: read list
