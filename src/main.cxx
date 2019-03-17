@@ -171,6 +171,41 @@ glm::mat4 getObjectModelMatrix() {
     return matrix;
 }
 
+struct Material {
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+    float shininess;
+};
+
+Material getObjectMaterial() {
+    // Read more: http://devernay.free.fr/cours/opengl/materials.html
+    return Material{
+        glm::vec3(0.135, 0.2225, 0.1575),
+        glm::vec3(0.54, 0.89, 0.63),
+        glm::vec3(0.316228, 0.316228, 0.316228),
+        0.1
+    };
+};
+
+
+struct Light {
+    glm::vec3 position;
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+};
+
+Light getLight() {
+    return Light{
+        glm::vec3(-1.f, 0.95f, 1.f),
+        glm::vec3(0.2f, 0.2f, 0.2f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
+        glm::vec3(1.0f, 1.0f, 1.0f)
+    };
+}
+
+
 // Get light source model matrix (local -> world)
 glm::mat4 getLightModelMatrix(glm::vec3 lightPosition) {
     glm::mat4 matrix = glm::mat4(1.f);
@@ -184,13 +219,13 @@ void startGameLoop(GLFWwindow* window, Application &app) {
     GLuint cube = createVertexBuffer();
     GLuint object = createVertexArrayObject(cube);
     GLuint light = createLightArrayObject(cube);
-    glm::vec3 lightPosition = glm::vec3(-1.f, 0.95f, 1.f);
-    glm::vec3 lightColor = glm::vec3(0.66f, 0.75f, 0.90f);
 
     // create textures and shaders
     Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
     Shader lightShader = Shader("light/vertex.glsl", "light/fragment.glsl");
-    Texture texture = Texture("assets/marble.png");
+    Texture objTexture = Texture("assets/marble.png");
+    Material objMaterial = getObjectMaterial();
+    Light lightSpecs = getLight();
 
     while(!glfwWindowShouldClose(window)) {
         // update application
@@ -205,20 +240,27 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         objShader.setMatrix("model", getObjectModelMatrix());
         objShader.setMatrix("view", app.camera.getViewMatrix());
         objShader.setMatrix("projection", app.camera.getProjectionMatrix());
-        objShader.setVec3("lightColor", lightColor);
-        objShader.setVec3("lightPos", lightPosition);
         objShader.setVec3("viewPos", app.camera.getPos());
+        objShader.setVec3("material.ambient", objMaterial.ambient);
+        objShader.setVec3("material.diffuse", objMaterial.diffuse);
+        objShader.setVec3("material.specular", objMaterial.specular);
+        objShader.setFloat("material.shininess", objMaterial.shininess);
+        objShader.setVec3("light.position", lightSpecs.position);
+        objShader.setVec3("light.diffuse", lightSpecs.diffuse);
+        objShader.setVec3("light.ambient", lightSpecs.ambient);
+        objShader.setVec3("light.specular", lightSpecs.specular);
+
         glBindVertexArray(object);
-        texture.bind();
+        objTexture.bind();
         glDrawArrays(GL_TRIANGLES, 0, 36);
         //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
 
         // draw light source
         lightShader.use();
-        lightShader.setMatrix("model", getLightModelMatrix(lightPosition));
+        lightShader.setMatrix("model", getLightModelMatrix(lightSpecs.position));
         lightShader.setMatrix("view", app.camera.getViewMatrix());
         lightShader.setMatrix("projection", app.camera.getProjectionMatrix());
-        lightShader.setVec3("lightColor", lightColor);
+        lightShader.setVec3("lightColor", glm::vec3(1.f, 1.f, 1.f));
         glBindVertexArray(light);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
