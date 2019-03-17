@@ -1,15 +1,14 @@
-//
-// Created by Max Zhuravsky on 2019-02-19.
-//
-
 #include "Texture.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#include <iostream>
 
-Texture::Texture(const std::string &filename) {
+Texture::Texture(const std::string &name, const std::string &path) : type(name), path(path) {
+    std::cout << "[Texture] loading texture: " << path << std::endl;
+
     // load image
     int width, height, nrChannels;
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 
     // create texture object
     GLuint texture;

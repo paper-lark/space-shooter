@@ -1,5 +1,5 @@
-#ifndef MAIN_CALLBACKS_H
-#define MAIN_CALLBACKS_H
+#ifndef SPACESHOOTER_CALLBACKS_H
+#define SPACESHOOTER_CALLBACKS_H
 
 #define GL_SILENCE_DEPRECATION
 #include <GLFW/glfw3.h>
@@ -18,4 +18,4 @@ public:
 };
 
 
-#endif //MAIN_CALLBACKS_H
+#endif //SPACESHOOTER_CALLBACKS_H

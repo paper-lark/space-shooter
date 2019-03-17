@@ -1,5 +1,5 @@
-#ifndef MAIN_APPLICATION_H
-#define MAIN_APPLICATION_H
+#ifndef SPACESHOOTER_APPLICATION_H
+#define SPACESHOOTER_APPLICATION_H
 
 #define GL_SILENCE_DEPRECATION
 #include <glad/glad.h>
@@ -46,4 +46,4 @@ public:
     }
 };
 
-#endif //MAIN_APPLICATION_H
+#endif //SPACESHOOTER_APPLICATION_H

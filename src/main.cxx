@@ -6,7 +6,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <random>
 #include <iostream>
-#include "utils/Texture.h"
+#include "model/Texture.h"
 #include "core/Application.h"
 #include "core/Callback.h"
 #include "utils/Shader.h"
@@ -247,9 +247,9 @@ void startGameLoop(GLFWwindow* window, Application &app) {
     // create textures and shaders
     Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
     Shader lightShader = Shader("light/vertex.glsl", "light/fragment.glsl");
-    Texture objTexture = Texture("assets/container.jpg");
-    Texture objSpecularMap = Texture("assets/container_specular.jpg");
-    Texture objEmissionMap = Texture("assets/rune.jpg");
+    Texture objDiffuseMap = Texture("texture_diffuse", "assets/container/container.jpg");
+    Texture objSpecularMap = Texture("texture_specular", "assets/container/container_specular.jpg");
+    Texture objEmissionMap = Texture("texture_emission", "assets/container/rune.jpg");
     Material objMaterial = getObjectMaterial();
     Light lightSpecs = getLight();
 
@@ -266,9 +266,9 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         objShader.setMatrix("view", app.camera.getViewMatrix());
         objShader.setMatrix("projection", app.camera.getProjectionMatrix());
         objShader.setVec3("viewPos", app.camera.getPos());
-        objShader.setInt("material.diffuse", 0);
-        objShader.setInt("material.specular", 1);
-        objShader.setInt("material.emission", 2);
+        objShader.setInt("material.texture_diffuse1", 0);
+        objShader.setInt("material.texture_specular1", 1);
+        objShader.setInt("material.texture_emission1", 2);
         objShader.setFloat("material.shininess", objMaterial.shininess);
 
         objShader.setVec3("dirLight.direction", glm::vec3(0.f, 10.f, 5.f));
@@ -299,7 +299,7 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         }
 
         glBindVertexArray(object);
-        objTexture.bind(GL_TEXTURE0);
+        objDiffuseMap.bind(GL_TEXTURE0);
         objSpecularMap.bind(GL_TEXTURE1);
         objEmissionMap.bind(GL_TEXTURE2);
 

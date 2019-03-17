@@ -1,5 +1,5 @@
-#ifndef MAIN_SHADER_H
-#define MAIN_SHADER_H
+#ifndef SPACESHOOTER_SHADER_H
+#define SPACESHOOTER_SHADER_H
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -26,4 +26,4 @@ public:
 };
 
 
-#endif //MAIN_SHADER_H
+#endif //SPACESHOOTER_SHADER_H

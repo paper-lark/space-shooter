@@ -7,7 +7,7 @@ set(SOURCE_FILES
         src/main.cxx
         src/core/Callback.cxx src/core/Callback.h
         src/core/Application.cxx src/core/Application.h
-        src/utils/Shader.cpp src/utils/Shader.h dependencies/include/stb_image.h src/utils/Texture.cpp src/utils/Texture.h src/core/Camera.cpp src/core/Camera.h src/core/Camera.cpp src/core/Camera.h)
+        src/utils/Shader.cpp src/utils/Shader.h dependencies/include/stb_image.h src/model/Texture.cpp src/model/Texture.h src/core/Camera.cpp src/core/Camera.h src/core/Camera.cpp src/core/Camera.h src/model/Mesh.cpp src/model/Mesh.h src/model/Model.cpp src/model/Model.h)
 set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 

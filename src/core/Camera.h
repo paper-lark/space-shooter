@@ -1,5 +1,5 @@
-#ifndef MAIN_CAMERA_H
-#define MAIN_CAMERA_H
+#ifndef SPACESHOOTER_CAMERA_H
+#define SPACESHOOTER_CAMERA_H
 
 #include <glm/glm.hpp>
 
@@ -39,4 +39,4 @@ public:
 };
 
 
-#endif //MAIN_CAMERA_H
+#endif //SPACESHOOTER_CAMERA_H
