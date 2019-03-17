@@ -276,7 +276,7 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         objShader.setVec3("dirLight.ambient", lightSpecs.ambient);
         objShader.setVec3("dirLight.specular", lightSpecs.specular);
 
-        objShader.setVec3("flashlight.position", app.camera.getPos()); 
+        objShader.setVec3("flashlight.position", app.camera.getPos());
         objShader.setVec3("flashlight.direction", app.camera.getDirection());
         objShader.setFloat("flashlight.innerCutOff", glm::cos(glm::radians(12.5f)));
         objShader.setFloat("flashlight.outerCutOff", glm::cos(glm::radians(17.5f)));
