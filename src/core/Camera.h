@@ -8,7 +8,7 @@ class Camera {
     glm::vec3 position = glm::vec3(-3.0f, 0.5f, 0.0f);
     float pitch = 0.f; // camera pitch in deg
     float yaw = 0.f; // camera yaw in deg
-    float fov = 45.f; // camera field of view
+    float fov = 45.f; // camera field of view in deg
     const float speed = 0.5f; // camera movement speed
 
 public:
