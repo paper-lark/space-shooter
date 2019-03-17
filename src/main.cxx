@@ -165,7 +165,6 @@ GLuint createLightArrayObject(GLuint vbo) {
 }
 
 struct Light {
-    glm::vec4 vector;
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
@@ -177,7 +176,6 @@ struct Light {
 
 Light getLight() {
     return Light{
-        glm::vec4(-1.f, 0.95f, 1.f, 1.f),
         glm::vec3(0.2f, 0.2f, 0.2f),
         glm::vec3(0.5f, 0.5f, 0.5f),
         glm::vec3(1.0f, 1.0f, 1.0f),
@@ -206,10 +204,10 @@ void startGameLoop(GLFWwindow* window, Application &app) {
     GLuint cube = createVertexBuffer();
     GLuint light = createLightArrayObject(cube);
     glm::vec3 pointLightPositions[] = {
-            glm::vec3( 0.7f, 0.2f, 2.0f),
-            glm::vec3( 1.3f, -2.3f, -2.0f),
-            glm::vec3(-1.0f, 2.0f, -1.0f),
-            glm::vec3( 0.0f, 0.0f, -1.0f)
+            glm::vec3( 5.7f, 2.75f, 4.0f),
+            glm::vec3( 3.3f, -1.f, -4.0f),
+            glm::vec3(-5.0f, 6.0f, -1.0f),
+            glm::vec3( 1.25f, 1.75f, -3.0f)
     };
 
     // create textures and shaders

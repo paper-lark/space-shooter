@@ -82,7 +82,7 @@ vec3 calculatePointLight(PointLight light, vec3 normal, vec3 viewDir) {
 	vec3 ambient = light.ambient * vec3(texture(material.texture_diffuse1, texCoords));
 	vec3 diffuse = light.diffuse * diff * vec3(texture(material.texture_diffuse1, texCoords));
 	vec3 specular = light.specular * spec * vec3(texture(material.texture_specular1, texCoords));
-	return (ambient + diffuse + specular) * attenuation;
+	return max((ambient + diffuse + specular) * attenuation, 0.f);
 }
 
 vec3 calculateFlashlightLight(SpotlightLight light, vec3 normal, vec3 viewDir) {
@@ -106,21 +106,20 @@ vec3 calculateFlashlightLight(SpotlightLight light, vec3 normal, vec3 viewDir) {
 
 
 void main() {
-	// TODO: fix
-	FragColor = texture(material.texture_diffuse1, texCoords);
-	return;
 
 	// calculate prerequisites
 	vec3 normal = normalize(Normal);
 	vec3 viewDir = normalize(viewPos - FragPos);
-	vec4 light = texture(material.texture_emission1, texCoords); // emission light
+	vec3 light = texture(material.texture_emission1, texCoords).xyz; // TODO: fix emission light
 
 	// calculate light
-	light += vec4(calculateDirectionalLight(dirLight, normal, viewDir), 1.f);
-	for (int i = 0; i < POINT_LIGHTS_COUNT; i++) {
-		light += vec4(calculatePointLight(pointLights[i], normal, viewDir), 1.f);
-	}
-	light += vec4(calculateFlashlightLight(flashlight, normal, viewDir), 1.f);
+	light += calculateDirectionalLight(dirLight, normal, viewDir);
 
-    FragColor = texture(material.texture_diffuse1, texCoords) * light;
+	for (int i = 0; i < POINT_LIGHTS_COUNT; i++) {
+		vec3 delta = calculatePointLight(pointLights[i], normal, viewDir);
+		light += delta;
+	}
+	light += calculateFlashlightLight(flashlight, normal, viewDir);
+
+    FragColor = vec4(light, 1.f) * texture(material.texture_diffuse1, texCoords);
 }
