@@ -49,48 +49,48 @@ int initializeGL() {
 // Create vertex buffer with a rectangle
 GLuint createVertexBuffer() {
     float vertices[] = {
-             // coordinates       // normal in vertex  // texture coordinates
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.00f, 0.66f,
-             0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.00f, 0.33f,
-             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.25f, 0.33f,
-             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.25f, 0.33f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.25f, 0.66f,
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.00f, 0.66f,
+            // positions          // normals           // texture coords
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+             0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.75f, 0.66f,
-             0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.75f, 0.33f,
-             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.50f, 0.33f,
-             0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.50f, 0.33f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.50f, 0.66f,
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.75f, 0.66f,
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
 
-            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.50f, 0.66f,
-            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.25f, 0.66f,
-            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.25f, 1.00f,
-            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.25f, 1.00f,
-            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.50f, 1.00f,
-            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.50f, 0.66f,
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.50f, 0.33f,
-             0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.25f, 0.33f,
-             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.25f, 0.00f,
-             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.25f, 0.00f,
-             0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.50f, 0.00f,
-             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.50f, 0.33f,
+             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+             0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+             0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.00f, 0.66f,
-             0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.00f, 0.33f,
-             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.75f, 0.33f,
-             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.75f, 0.33f,
-            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.75f, 0.66f,
-            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.00f, 0.66f,
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
 
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.25f, 0.66f,
-             0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.25f, 0.33f,
-             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.50f, 0.33f,
-             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.50f, 0.33f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.50f, 0.66f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.25f, 0.66f
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+             0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
 
     GLuint vertexBufferObject;
@@ -172,9 +172,9 @@ glm::mat4 getObjectModelMatrix() {
 }
 
 struct Material {
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
+    glm::vec3 ambient; // TODO: remove as we use diffuse instead
+    glm::vec3 diffuse; // TODO: remove as we use texture as diffuse map
+    glm::vec3 specular; // TODO: remove as we use specular map
     float shininess;
 };
 
@@ -223,7 +223,9 @@ void startGameLoop(GLFWwindow* window, Application &app) {
     // create textures and shaders
     Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
     Shader lightShader = Shader("light/vertex.glsl", "light/fragment.glsl");
-    Texture objTexture = Texture("assets/marble.png");
+    Texture objTexture = Texture("assets/container.jpg");
+    Texture objSpecularMap = Texture("assets/container_specular.jpg");
+    Texture objEmissionMap = Texture("assets/rune.jpg");
     Material objMaterial = getObjectMaterial();
     Light lightSpecs = getLight();
 
@@ -241,9 +243,9 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         objShader.setMatrix("view", app.camera.getViewMatrix());
         objShader.setMatrix("projection", app.camera.getProjectionMatrix());
         objShader.setVec3("viewPos", app.camera.getPos());
-        objShader.setVec3("material.ambient", objMaterial.ambient);
-        objShader.setVec3("material.diffuse", objMaterial.diffuse);
-        objShader.setVec3("material.specular", objMaterial.specular);
+        objShader.setInt("material.diffuse", 0);
+        objShader.setInt("material.specular", 1);
+        objShader.setInt("material.emission", 2);
         objShader.setFloat("material.shininess", objMaterial.shininess);
         objShader.setVec3("light.position", lightSpecs.position);
         objShader.setVec3("light.diffuse", lightSpecs.diffuse);
@@ -251,7 +253,9 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         objShader.setVec3("light.specular", lightSpecs.specular);
 
         glBindVertexArray(object);
-        objTexture.bind();
+        objTexture.bind(GL_TEXTURE0);
+        objSpecularMap.bind(GL_TEXTURE1);
+        objEmissionMap.bind(GL_TEXTURE2);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
 
