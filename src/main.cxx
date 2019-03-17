@@ -190,18 +190,24 @@ Material getObjectMaterial() {
 
 
 struct Light {
-    glm::vec3 position;
+    glm::vec4 vector;
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
+
+    float constant;
+    float linear;
+    float quadratic;
 };
 
 Light getLight() {
     return Light{
-        glm::vec3(-1.f, 0.95f, 1.f),
+        glm::vec4(-1.f, 0.95f, 1.f, 1.f),
         glm::vec3(0.2f, 0.2f, 0.2f),
         glm::vec3(0.5f, 0.5f, 0.5f),
-        glm::vec3(1.0f, 1.0f, 1.0f)
+        glm::vec3(1.0f, 1.0f, 1.0f),
+
+        1.0, 0.09, 0.032
     };
 }
 
@@ -210,7 +216,7 @@ Light getLight() {
 glm::mat4 getLightModelMatrix(glm::vec3 lightPosition) {
     glm::mat4 matrix = glm::mat4(1.f);
     matrix = glm::translate(matrix, lightPosition);
-    return glm::scale(matrix, glm::vec3(0.25f, 0.25f, 0.25f));
+    return glm::scale(matrix, glm::vec3(0.1f, 0.1f, 0.1f));
 }
 
 // Start game loop that ends when GLFW is signaled to close
@@ -219,6 +225,18 @@ void startGameLoop(GLFWwindow* window, Application &app) {
     GLuint cube = createVertexBuffer();
     GLuint object = createVertexArrayObject(cube);
     GLuint light = createLightArrayObject(cube);
+    glm::vec3 cubePositions[] = {
+            glm::vec3( 0.0f, 0.0f, 0.0f),
+            glm::vec3( 2.0f, 5.0f, -15.0f),
+            glm::vec3(-1.5f, -2.2f, -2.5f),
+            glm::vec3(-3.8f, -2.0f, -12.3f),
+            glm::vec3( 2.4f, -0.4f, -3.5f),
+            glm::vec3(-1.7f, 3.0f, -7.5f),
+            glm::vec3( 1.3f, -2.0f, -2.5f),
+            glm::vec3( 1.5f, 2.0f, -2.5f),
+            glm::vec3( 1.5f, 0.2f, -1.5f),
+            glm::vec3(-1.3f, 1.0f, -1.5f)
+    };
 
     // create textures and shaders
     Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
@@ -239,7 +257,6 @@ void startGameLoop(GLFWwindow* window, Application &app) {
 
         // draw object
         objShader.use();
-        objShader.setMatrix("model", getObjectModelMatrix());
         objShader.setMatrix("view", app.camera.getViewMatrix());
         objShader.setMatrix("projection", app.camera.getProjectionMatrix());
         objShader.setVec3("viewPos", app.camera.getPos());
@@ -247,27 +264,40 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         objShader.setInt("material.specular", 1);
         objShader.setInt("material.emission", 2);
         objShader.setFloat("material.shininess", objMaterial.shininess);
-        objShader.setVec3("light.position", lightSpecs.position);
+        objShader.setVec4("light.vector", lightSpecs.vector);
         objShader.setVec3("light.diffuse", lightSpecs.diffuse);
         objShader.setVec3("light.ambient", lightSpecs.ambient);
         objShader.setVec3("light.specular", lightSpecs.specular);
+        objShader.setFloat("light.constant", lightSpecs.constant);
+        objShader.setFloat("light.linear", lightSpecs.linear);
+        objShader.setFloat("light.quadratic", lightSpecs.quadratic);
 
         glBindVertexArray(object);
         objTexture.bind(GL_TEXTURE0);
         objSpecularMap.bind(GL_TEXTURE1);
         objEmissionMap.bind(GL_TEXTURE2);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+
+        for (int i = 0; i < 10; i++) {
+            glm::mat4 model = glm::mat4(1.f);
+            model = glm::translate(model, cubePositions[i]);
+            model = glm::rotate(model, glm::radians(20.0f * i), glm::vec3(1.0f, 0.3f, 0.5f));
+            objShader.setMatrix("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+            //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+        }
+
 
         // draw light source
-        lightShader.use();
-        lightShader.setMatrix("model", getLightModelMatrix(lightSpecs.position));
-        lightShader.setMatrix("view", app.camera.getViewMatrix());
-        lightShader.setMatrix("projection", app.camera.getProjectionMatrix());
-        lightShader.setVec3("lightColor", glm::vec3(1.f, 1.f, 1.f));
-        glBindVertexArray(light);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+        if (lightSpecs.vector.w == 1.f) {
+            lightShader.use();
+            lightShader.setMatrix("model", getLightModelMatrix(lightSpecs.vector));
+            lightShader.setMatrix("view", app.camera.getViewMatrix());
+            lightShader.setMatrix("projection", app.camera.getProjectionMatrix());
+            lightShader.setVec3("lightColor", glm::vec3(1.f, 1.f, 1.f));
+            glBindVertexArray(light);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
 
         // update color buffers
         glfwSwapBuffers(window); // swap front and back color buffers
