@@ -3,6 +3,7 @@
 
 struct Material {
 	sampler2D texture_diffuse1;
+	sampler2D texture_diffuse2;
 	sampler2D texture_specular1;
 	sampler2D texture_emission1;
 	float shininess;
@@ -105,6 +106,10 @@ vec3 calculateFlashlightLight(SpotlightLight light, vec3 normal, vec3 viewDir) {
 
 
 void main() {
+	// TODO: fix
+	FragColor = texture(material.texture_diffuse1, texCoords);
+	return;
+
 	// calculate prerequisites
 	vec3 normal = normalize(Normal);
 	vec3 viewDir = normalize(viewPos - FragPos);

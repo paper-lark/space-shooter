@@ -15,13 +15,13 @@ class Model {
     vector<Texture> loadedTextures;
     string directory;
 
-    void loadModel(string &path);
-    void processNode(aiNode *node, const aiScene *scene);
-    Mesh processMesh(aiMesh *mesh, const aiScene *scene);
+    void loadModel(const string &path);
+    void processNode(const aiNode *node, const aiScene *scene);
+    Mesh processMesh(const aiMesh *mesh, const aiScene *scene);
     vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, const string &typeName);
 
 public:
-    Model(string &path) {
+    Model(const string &path) {
         loadModel(path);
     }
 

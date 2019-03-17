@@ -26,17 +26,19 @@ void Mesh::setupMesh() {
 
     // bind array
     glBindVertexArray(0);
+    std::cout << "[MESH] Created mesh with  {" << vbo << "} {" << vao << "}" << std::endl;
 }
 
-void Mesh::Draw(Shader shader) {
+void Mesh::Draw(Shader shader) const {
+
     // bind textures
     unsigned currentDiffuse = 1;
     unsigned currentSpecular = 1;
     unsigned currentEmission = 1;
     unsigned current = 0;
-    for (Texture &texture : textures) {
+    for (const Texture &texture : textures) {
         std::string number;
-        std::string name = texture.getName();
+        const std::string name = texture.getName();
         texture.bind(GL_TEXTURE0 + current);
 
         if (name == "texture_diffuse") {
@@ -48,7 +50,10 @@ void Mesh::Draw(Shader shader) {
         } else {
             std::cerr << "Unknown texture type: " << name << std::endl;
         }
-        shader.setFloat(std::string("material.").append(name).append(number), current);
+
+        std::string uniformLabel = std::string("material.").append(name).append(number);
+        std::cout << "[MESH] Using texture {" << texture.getPath()  << "} as {" << uniformLabel << "}" << std::endl;
+        shader.setFloat(uniformLabel, current);
         current++;
     }
 

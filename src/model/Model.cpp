@@ -8,24 +8,24 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-void Model::loadModel(string &path) {
+void Model::loadModel(const string &path) {
     Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        std::cerr << "[ASSIMP] " << importer.GetErrorString() << std::endl;
-        return;
+        throw std::runtime_error(std::string("Failed to load model: ").append(importer.GetErrorString()));
     }
     directory = path.substr(0, path.find_last_of('/'));
     processNode(scene->mRootNode, scene);
 }
 
-void Model::processNode(aiNode *node, const aiScene *scene) {
+void Model::processNode(const aiNode *node, const aiScene *scene) {
     // process node mesh
     // TODO: create relations between meshes
     for(unsigned i = 0; i < node->mNumMeshes; i++) {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.push_back(processMesh(mesh, scene));
+        std::cout << "[MODEL] Current mesh count: " << meshes.size() << std::endl;
     }
 
     // repeat process for all its children
@@ -34,7 +34,7 @@ void Model::processNode(aiNode *node, const aiScene *scene) {
     }
 }
 
-Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
+Mesh Model::processMesh(const aiMesh *mesh, const aiScene *scene) {
     vector<Vertex> vertices;
     vector<unsigned> indices;
     vector<Texture> textures;
@@ -79,7 +79,6 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     }
-
     return Mesh(vertices, indices, textures);
 }
 
@@ -91,7 +90,7 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type,
         // paths are expected to be local to the model
         aiString localPath;
         mat->GetTexture(type, i, &localPath);
-        std::string path = directory.append(localPath.C_Str());
+        std::string path = directory + std::string("/").append(localPath.C_Str());
 
         // look for texture among already loaded ones
         for (Texture &t : loadedTextures) {
@@ -113,7 +112,7 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type,
 }
 
 void Model::Draw(Shader &shader) {
-    for (Mesh mesh : meshes) {
+    for (const Mesh &mesh : meshes) {
         mesh.Draw(shader);
     }
 }

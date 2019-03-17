@@ -25,22 +25,23 @@ class Mesh {
     GLuint vao = 0, vbo = 0, ebo = 0;
     void setupMesh();
 public:
-    vector<Vertex> vertices;
-    vector<unsigned> indices;
-    vector<Texture> textures;
+    const vector<Vertex> vertices;
+    const vector<unsigned> indices;
+    const vector<Texture> textures;
 
-    Mesh(vector<Vertex> &vertices, vector<unsigned int> &indices, vector<Texture> &textures) :
+    Mesh(vector<Vertex> &vertices, vector<unsigned> &indices, vector<Texture> &textures) :
         vertices(vertices), indices(indices), textures(textures) {
         setupMesh();
     };
 
-    void Draw(Shader shader);
+    void Draw(Shader shader) const;
 
-    ~Mesh() {
-        glDeleteVertexArrays(1, &vao);
-        glDeleteBuffers(1, &vbo);
-        glDeleteBuffers(1, &ebo);
-    }
+// TODO: fix
+//    ~Mesh() {
+//        glDeleteVertexArrays(1, &vao);
+//        glDeleteBuffers(1, &vbo);
+//        glDeleteBuffers(1, &ebo);
+//    }
 };
 
 

@@ -8,8 +8,7 @@ GLuint loadShader(GLenum type, const std::string &filename) {
     // read shader from file
     std::ifstream fs(filename);
     if (!fs.is_open()) {
-        std::cerr << "Failed to load shader file: " << filename << std::endl;
-        throw std::runtime_error("Shader missing");
+        throw std::runtime_error("Failed to load shader file: " + filename);
     }
     std::string shaderText((std::istreambuf_iterator<char>(fs)), std::istreambuf_iterator<char>());
 
@@ -26,8 +25,7 @@ GLuint loadShader(GLenum type, const std::string &filename) {
     if (compilationStatus != GL_TRUE) {
         GLchar infoLog[512];
         glGetShaderInfoLog(shaderObject, 512, nullptr, infoLog);
-        std::cerr << "Shader compilation failed: " << std::endl << infoLog << std::endl;
-        throw std::runtime_error("Shader compilation failed");
+        throw std::runtime_error(std::string("Shader compilation failed").append(infoLog));
     }
 
     return shaderObject;
@@ -52,8 +50,7 @@ Shader::Shader(const std::string &vertexPath, const std::string &fragmentPath) {
     if (success != GL_TRUE) {
         GLchar infoLog[512];
         glGetProgramInfoLog(this->ID, 512, nullptr, infoLog);
-        std::cerr << "Shader linking failed: " << std::endl << infoLog << std::endl;
-        throw std::runtime_error("Shader linking failed");
+        throw std::runtime_error(std::string("Shader linking failed: ").append(infoLog));
     }
 }
 

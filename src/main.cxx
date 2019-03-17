@@ -11,6 +11,7 @@
 #include "core/Callback.h"
 #include "utils/Shader.h"
 #include "core/Camera.h"
+#include "model/Model.h"
 #define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH 800
 #define WINDOW_TITLE "OpenGL Introduction"
@@ -163,32 +164,6 @@ GLuint createLightArrayObject(GLuint vbo) {
     return lightVAO;
 }
 
-// Get object model matrix (local -> world)
-glm::mat4 getObjectModelMatrix() {
-    glm::mat4 matrix = glm::mat4(1.f);
-    matrix = glm::translate(matrix, glm::vec3(0.f, 0.f, 0.f));
-    matrix = glm::rotate(matrix, glm::radians(30.f), glm::vec3(0.f, 1.f, 0.f));
-    return matrix;
-}
-
-struct Material {
-    glm::vec3 ambient; // TODO: remove as we use diffuse instead
-    glm::vec3 diffuse; // TODO: remove as we use texture as diffuse map
-    glm::vec3 specular; // TODO: remove as we use specular map
-    float shininess;
-};
-
-Material getObjectMaterial() {
-    // Read more: http://devernay.free.fr/cours/opengl/materials.html
-    return Material{
-        glm::vec3(0.135, 0.2225, 0.1575),
-        glm::vec3(0.54, 0.89, 0.63),
-        glm::vec3(0.316228, 0.316228, 0.316228),
-        0.1
-    };
-};
-
-
 struct Light {
     glm::vec4 vector;
     glm::vec3 ambient;
@@ -211,6 +186,12 @@ Light getLight() {
     };
 }
 
+// Get object source model matrix (local -> world)
+glm::mat4 getObjectModelMatrix() {
+    glm::mat4 matrix = glm::mat4(1.f);
+    return glm::scale(matrix, glm::vec3(0.05f, 0.05f, 0.05f));
+}
+
 
 // Get light source model matrix (local -> world)
 glm::mat4 getLightModelMatrix(glm::vec3 lightPosition) {
@@ -223,34 +204,18 @@ glm::mat4 getLightModelMatrix(glm::vec3 lightPosition) {
 void startGameLoop(GLFWwindow* window, Application &app) {
     // create prerequisites
     GLuint cube = createVertexBuffer();
-    GLuint object = createVertexArrayObject(cube);
     GLuint light = createLightArrayObject(cube);
-    glm::vec3 cubePositions[] = {
-            glm::vec3( 0.0f, 0.0f, 0.0f),
-            glm::vec3( 2.0f, 5.0f, -15.0f),
-            glm::vec3(-1.5f, -2.2f, -2.5f),
-            glm::vec3(-3.8f, -2.0f, -12.3f),
-            glm::vec3( 2.4f, -0.4f, -3.5f),
-            glm::vec3(-1.7f, 3.0f, -7.5f),
-            glm::vec3( 1.3f, -2.0f, -2.5f),
-            glm::vec3( 1.5f, 2.0f, -2.5f),
-            glm::vec3( 1.5f, 0.2f, -1.5f),
-            glm::vec3(-1.3f, 1.0f, -1.5f)
-    };
     glm::vec3 pointLightPositions[] = {
             glm::vec3( 0.7f, 0.2f, 2.0f),
-            glm::vec3( 2.3f, -3.3f, -4.0f),
-            glm::vec3(-3.0f, 2.0f, -9.0f),
-            glm::vec3( 0.0f, 0.0f, -3.0f)
+            glm::vec3( 1.3f, -2.3f, -2.0f),
+            glm::vec3(-1.0f, 2.0f, -1.0f),
+            glm::vec3( 0.0f, 0.0f, -1.0f)
     };
 
     // create textures and shaders
     Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
     Shader lightShader = Shader("light/vertex.glsl", "light/fragment.glsl");
-    Texture objDiffuseMap = Texture("texture_diffuse", "assets/container/container.jpg");
-    Texture objSpecularMap = Texture("texture_specular", "assets/container/container_specular.jpg");
-    Texture objEmissionMap = Texture("texture_emission", "assets/container/rune.jpg");
-    Material objMaterial = getObjectMaterial();
+    Model objectModel{"assets/nanosuit/nanosuit.obj"};
     Light lightSpecs = getLight();
 
     while(!glfwWindowShouldClose(window)) {
@@ -266,10 +231,7 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         objShader.setMatrix("view", app.camera.getViewMatrix());
         objShader.setMatrix("projection", app.camera.getProjectionMatrix());
         objShader.setVec3("viewPos", app.camera.getPos());
-        objShader.setInt("material.texture_diffuse1", 0);
-        objShader.setInt("material.texture_specular1", 1);
-        objShader.setInt("material.texture_emission1", 2);
-        objShader.setFloat("material.shininess", objMaterial.shininess);
+        objShader.setMatrix("model", getObjectModelMatrix());
 
         objShader.setVec3("dirLight.direction", glm::vec3(0.f, 10.f, 5.f));
         objShader.setVec3("dirLight.diffuse", lightSpecs.diffuse);
@@ -298,19 +260,7 @@ void startGameLoop(GLFWwindow* window, Application &app) {
             objShader.setFloat(prefix + ".quadratic", lightSpecs.quadratic);
         }
 
-        glBindVertexArray(object);
-        objDiffuseMap.bind(GL_TEXTURE0);
-        objSpecularMap.bind(GL_TEXTURE1);
-        objEmissionMap.bind(GL_TEXTURE2);
-
-        for (int i = 0; i < 10; i++) {
-            glm::mat4 model = glm::mat4(1.f);
-            model = glm::translate(model, cubePositions[i]);
-            model = glm::rotate(model, glm::radians(20.0f * i), glm::vec3(1.0f, 0.3f, 0.5f));
-            objShader.setMatrix("model", model);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-            //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
-        }
+        objectModel.Draw(objShader);
 
 
         // draw light sources
@@ -331,14 +281,11 @@ void startGameLoop(GLFWwindow* window, Application &app) {
     }
 
     // release resources
-    glDeleteVertexArrays(1, &object);
     glDeleteVertexArrays(1, &light);
     glDeleteBuffers(1, &cube);
 }
 
-// TODO: read list
-// https://learnopengl.com/Getting-started/Shaders
-// https://learnopengl.com/In-Practice/Debugging
+// Entry point
 int main(int argc, char **argv) {
     // Create window
     initializeGLFW();
