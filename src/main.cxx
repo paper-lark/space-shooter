@@ -237,6 +237,12 @@ void startGameLoop(GLFWwindow* window, Application &app) {
             glm::vec3( 1.5f, 0.2f, -1.5f),
             glm::vec3(-1.3f, 1.0f, -1.5f)
     };
+    glm::vec3 pointLightPositions[] = {
+            glm::vec3( 0.7f, 0.2f, 2.0f),
+            glm::vec3( 2.3f, -3.3f, -4.0f),
+            glm::vec3(-3.0f, 2.0f, -9.0f),
+            glm::vec3( 0.0f, 0.0f, -3.0f)
+    };
 
     // create textures and shaders
     Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
@@ -264,13 +270,33 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         objShader.setInt("material.specular", 1);
         objShader.setInt("material.emission", 2);
         objShader.setFloat("material.shininess", objMaterial.shininess);
-        objShader.setVec4("light.vector", lightSpecs.vector);
-        objShader.setVec3("light.diffuse", lightSpecs.diffuse);
-        objShader.setVec3("light.ambient", lightSpecs.ambient);
-        objShader.setVec3("light.specular", lightSpecs.specular);
-        objShader.setFloat("light.constant", lightSpecs.constant);
-        objShader.setFloat("light.linear", lightSpecs.linear);
-        objShader.setFloat("light.quadratic", lightSpecs.quadratic);
+
+        objShader.setVec3("dirLight.direction", glm::vec3(0.f, 10.f, 5.f));
+        objShader.setVec3("dirLight.diffuse", lightSpecs.diffuse);
+        objShader.setVec3("dirLight.ambient", lightSpecs.ambient);
+        objShader.setVec3("dirLight.specular", lightSpecs.specular);
+
+        objShader.setVec3("flashlight.position", app.camera.getPos()); 
+        objShader.setVec3("flashlight.direction", app.camera.getDirection());
+        objShader.setFloat("flashlight.innerCutOff", glm::cos(glm::radians(12.5f)));
+        objShader.setFloat("flashlight.outerCutOff", glm::cos(glm::radians(17.5f)));
+        objShader.setVec3("flashlight.diffuse", lightSpecs.diffuse);
+        objShader.setVec3("flashlight.ambient", lightSpecs.ambient);
+        objShader.setVec3("flashlight.specular", lightSpecs.specular);
+        objShader.setFloat("flashlight.constant", lightSpecs.constant);
+        objShader.setFloat("flashlight.linear", lightSpecs.linear);
+        objShader.setFloat("flashlight.quadratic", lightSpecs.quadratic);
+
+        for (int i = 0; i < 4; i++) {
+            std::string prefix = "pointLights[" + std::to_string(i) + "]";
+            objShader.setVec3(prefix + ".position", pointLightPositions[i]);
+            objShader.setVec3(prefix + ".diffuse", lightSpecs.diffuse);
+            objShader.setVec3(prefix + ".ambient", lightSpecs.ambient);
+            objShader.setVec3(prefix + ".specular", lightSpecs.specular);
+            objShader.setFloat(prefix + ".constant", lightSpecs.constant);
+            objShader.setFloat(prefix + ".linear", lightSpecs.linear);
+            objShader.setFloat(prefix + ".quadratic", lightSpecs.quadratic);
+        }
 
         glBindVertexArray(object);
         objTexture.bind(GL_TEXTURE0);
@@ -287,10 +313,10 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         }
 
 
-        // draw light source
-        if (lightSpecs.vector.w == 1.f) {
+        // draw light sources
+        for (int i = 0; i < 4; i++) {
             lightShader.use();
-            lightShader.setMatrix("model", getLightModelMatrix(lightSpecs.vector));
+            lightShader.setMatrix("model", getLightModelMatrix(pointLightPositions[i]));
             lightShader.setMatrix("view", app.camera.getViewMatrix());
             lightShader.setMatrix("projection", app.camera.getProjectionMatrix());
             lightShader.setVec3("lightColor", glm::vec3(1.f, 1.f, 1.f));
