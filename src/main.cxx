@@ -13,6 +13,7 @@
 #include "utils/Shader.h"
 #include "core/Camera.h"
 #include "model/Model.h"
+#include <stb_image.h>
 #define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH 800
 #define WINDOW_TITLE "OpenGL Introduction"
@@ -43,6 +44,7 @@ int initializeGL() {
 
     // enable depth buffer
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
 
     return 0;
 }
@@ -187,7 +189,7 @@ Light getLight() {
 // Get object source model matrix (local -> world)
 glm::mat4 getObjectModelMatrix() {
     glm::mat4 matrix = glm::mat4(1.f);
-    return glm::scale(matrix, glm::vec3(0.05f, 0.05f, 0.05f));
+    return glm::scale(matrix, glm::vec3(0.0005f, 0.0005f, 0.0005f));
 }
 
 
@@ -196,6 +198,118 @@ glm::mat4 getLightModelMatrix(glm::vec3 lightPosition) {
     glm::mat4 matrix = glm::mat4(1.f);
     matrix = glm::translate(matrix, lightPosition);
     return glm::scale(matrix, glm::vec3(0.1f, 0.1f, 0.1f));
+}
+
+
+GLuint createSkyboxTexture() {
+    // create texture object
+    GLuint textureId;
+    glGenTextures(1, &textureId);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
+    vector<string> textures_faces = {
+            "assets/Skybox/lightblue/right.png",
+            "assets/Skybox/lightblue/left.png",
+            "assets/Skybox/lightblue/top.png",
+            "assets/Skybox/lightblue/bot.png",
+            "assets/Skybox/lightblue/back.png",
+            "assets/Skybox/lightblue/front.png"
+    };
+
+    // load faces
+    int width, height, nrChannels;
+    unsigned char *data;
+    for(GLuint i = 0; i < textures_faces.size(); i++) {
+
+        data = stbi_load(textures_faces[i].c_str(), &width, &height, &nrChannels, 0);
+
+        // decide format
+        GLenum format = GL_RGB;
+        if (nrChannels == 1) {
+            format = GL_RED;
+        } else if (nrChannels == 3) {
+            format = GL_RGB;
+        } else if (nrChannels == 4) {
+            format = GL_RGBA;
+        }
+
+        glTexImage2D(
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data
+        );
+        stbi_image_free(data);
+    }
+
+    // specify filtering parameters
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureId;
+}
+
+
+GLuint createSkyboxMesh() {
+    float vertices[] = {
+            // positions
+            -1.0f,  1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+
+            -1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f,  1.0f,
+            -1.0f, -1.0f,  1.0f,
+
+            1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+
+            -1.0f, -1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f,  1.0f,
+
+            -1.0f,  1.0f, -1.0f,
+            1.0f,  1.0f, -1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f, -1.0f,
+
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f,  1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f,  1.0f,
+            1.0f, -1.0f,  1.0f
+    };
+    GLuint vbo;
+    glGenBuffers(1, &vbo); // generate object
+    glBindBuffer(GL_ARRAY_BUFFER, vbo); // bind buffer to a vertex buffer type
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // load vertex data into buffer
+
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    // specify how to interpret vertex data from currently bound VBO
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+    glEnableVertexAttribArray(0);
+
+    return vao;
 }
 
 // Start game loop that ends when GLFW is signaled to close
@@ -213,8 +327,13 @@ void startGameLoop(GLFWwindow* window, Application &app) {
     // create textures and shaders
     Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
     Shader lightShader = Shader("light/vertex.glsl", "light/fragment.glsl");
+    Shader skyboxShader = Shader("skybox/vertex.glsl", "skybox/fragment.glsl");
     Model objectModel{"assets/Spaceship/Arc170.obj"};
     Light lightSpecs = getLight();
+
+    // setup skybox
+    GLuint skyboxTexture = createSkyboxTexture();
+    GLuint skyboxMesh = createSkyboxMesh();
 
     while(!glfwWindowShouldClose(window)) {
         // update application
@@ -262,8 +381,8 @@ void startGameLoop(GLFWwindow* window, Application &app) {
 
 
         // draw light sources
+        lightShader.use();
         for (int i = 0; i < 4; i++) {
-            lightShader.use();
             lightShader.setMatrix("model", getLightModelMatrix(pointLightPositions[i]));
             lightShader.setMatrix("view", app.camera.getViewMatrix());
             lightShader.setMatrix("projection", app.camera.getProjectionMatrix());
@@ -272,6 +391,16 @@ void startGameLoop(GLFWwindow* window, Application &app) {
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
+        // draw skybox
+        glDepthMask(GL_FALSE);
+        skyboxShader.use();
+        glm::mat4 view = glm::mat4(glm::mat3(app.camera.getViewMatrix()));
+        skyboxShader.setMatrix("view", view);
+        skyboxShader.setMatrix("projection", app.camera.getProjectionMatrix());
+        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+        glBindVertexArray(skyboxMesh);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDepthMask(GL_TRUE);
 
         // update color buffers
         glfwSwapBuffers(window); // swap front and back color buffers

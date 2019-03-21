@@ -28,7 +28,7 @@ Texture::Texture(const std::string &name, const std::string &path) : type(name),
         format = GL_RGB;
     } else if (nrChannels == 4) {
         format = GL_RGBA;
-    }
+    } // TODO: move image loading away from OpenGl
     SPDLOG_INFO("Data format resolved to {}", format == GL_RGB ? "RGB" : format == GL_RGBA ? "RGBA" : "RED");
 
 
