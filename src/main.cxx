@@ -211,8 +211,8 @@ GLuint createSkyboxTexture() {
             "assets/Skybox/lightblue/left.png",
             "assets/Skybox/lightblue/top.png",
             "assets/Skybox/lightblue/bot.png",
-            "assets/Skybox/lightblue/back.png",
-            "assets/Skybox/lightblue/front.png"
+            "assets/Skybox/lightblue/front.png",
+            "assets/Skybox/lightblue/back.png"
     };
 
     // load faces
@@ -392,7 +392,6 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         }
 
         // draw skybox
-        glDepthMask(GL_FALSE);
         skyboxShader.use();
         glm::mat4 view = glm::mat4(glm::mat3(app.camera.getViewMatrix()));
         skyboxShader.setMatrix("view", view);
@@ -400,7 +399,6 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
         glBindVertexArray(skyboxMesh);
         glDrawArrays(GL_TRIANGLES, 0, 36);
-        glDepthMask(GL_TRUE);
 
         // update color buffers
         glfwSwapBuffers(window); // swap front and back color buffers
