@@ -206,14 +206,14 @@ void startGameLoop(GLFWwindow* window, Application &app) {
     glm::vec3 pointLightPositions[] = {
             glm::vec3( 15.7f, 2.75f, 4.0f),
             glm::vec3( 13.3f, -1.f, -4.0f),
-            glm::vec3(-5.0f, 6.0f, -1.0f),
+            glm::vec3(-15.0f, 6.0f, -1.0f),
             glm::vec3( 10.25f, 1.75f, -3.0f)
     };
 
     // create textures and shaders
     Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
     Shader lightShader = Shader("light/vertex.glsl", "light/fragment.glsl");
-    Model objectModel{"assets/Ambassador/Ambassador Class.obj"};
+    Model objectModel{"assets/Spaceship/Arc170.obj"};
     Light lightSpecs = getLight();
 
     while(!glfwWindowShouldClose(window)) {

@@ -9,7 +9,7 @@ Texture::Texture(const std::string &name, const std::string &path) : type(name),
 
     // load image
     int width, height, nrChannels;
-    unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, STBI_rgb_alpha);
+    unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
 
     if (data == nullptr) {
         throw std::runtime_error("Failed to load texture: " + path);

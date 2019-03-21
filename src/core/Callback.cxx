@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Callback.h"
+#include <spdlog/spdlog.h>
 
 GLint Callback::windowSize[2] = {1, 1};
 
@@ -10,5 +11,5 @@ void Callback::windowResize(GLFWwindow *, GLint width, GLint height) {
 }
 
 void Callback::error(int code, const char *description) {
-    std::cerr << "Error occurred [" << code << "]: " << description << std::endl;
+    SPDLOG_ERROR("Error occurred: {} [{}]", description, code);
 }

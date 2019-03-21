@@ -66,7 +66,7 @@ vec3 calculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir
    	vec3 diffuse = light.diffuse * diff * vec3(texture(material.texture_diffuse1, texCoords));
    	vec3 specular = light.specular * spec * vec3(texture(material.texture_specular1, texCoords));
    	vec3 emission = vec3(texture(material.texture_emission1, texCoords));
-   	return ambient + diffuse + specular;
+   	return max(ambient + diffuse + specular, 0.f);
 }
 
 
@@ -101,7 +101,7 @@ vec3 calculateFlashlightLight(SpotlightLight light, vec3 normal, vec3 viewDir) {
 	vec3 diffuse = light.diffuse * diff * vec3(texture(material.texture_diffuse1, texCoords));
 	vec3 specular = light.specular * spec * vec3(texture(material.texture_specular1, texCoords));
 
-	return (ambient + intensity * diffuse + specular * intensity) * attenuation;
+	return max((ambient + intensity * diffuse + specular * intensity) * attenuation, 0.f);
 }
 
 
@@ -121,5 +121,5 @@ void main() {
 	}
 	light += calculateFlashlightLight(flashlight, normal, viewDir);
 
-    FragColor = vec4(light, 1.f) * texture(material.texture_diffuse1, texCoords);
+    FragColor = vec4(light, 1.f);
 }
