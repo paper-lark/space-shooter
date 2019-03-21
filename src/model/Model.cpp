@@ -1,16 +1,16 @@
-//
-// Created by Max Zhuravsky on 2019-03-17.
-//
-
 #include "Model.h"
 #include <iostream>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <spdlog/spdlog.h>
+
+#define CHECK_MESH(mesh) if (mesh->mNormals == nullptr) { throw std::runtime_error("Missing normals on the mesh"); } else if (mesh->mTextureCoords == nullptr) { throw std::runtime_error("Missing texture coordinates on the mesh"); }
 
 void Model::loadModel(const string &path) {
     Assimp::Importer importer;
-    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+    const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs |
+            aiProcess_GenNormals);
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
         throw std::runtime_error(std::string("Failed to load model: ").append(importer.GetErrorString()));
@@ -25,7 +25,7 @@ void Model::processNode(const aiNode *node, const aiScene *scene) {
     for(unsigned i = 0; i < node->mNumMeshes; i++) {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.push_back(processMesh(mesh, scene));
-        std::cout << "[MODEL] Current mesh count: " << meshes.size() << std::endl;
+        SPDLOG_INFO("Current mesh count: {}", meshes.size());
     }
 
     // repeat process for all its children
@@ -41,6 +41,7 @@ Mesh Model::processMesh(const aiMesh *mesh, const aiScene *scene) {
 
     // retrieve vertex information from mesh
     for (unsigned i = 0; i < mesh->mNumVertices; i++) {
+        CHECK_MESH(mesh);
         Vertex vertex(
                 glm::vec3(
                         mesh->mVertices[i].x,
@@ -85,28 +86,34 @@ Mesh Model::processMesh(const aiMesh *mesh, const aiScene *scene) {
 vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, const string &typeName) {
     vector<Texture> textures;
     unsigned textureCount = mat->GetTextureCount(type);
+
     for (unsigned i = 0; i < textureCount; i++) {
         // load texture
         // paths are expected to be local to the model
         aiString localPath;
         mat->GetTexture(type, i, &localPath);
         std::string path = directory + std::string("/").append(localPath.C_Str());
+        SPDLOG_INFO("Searching for material: {}", path);
 
         // look for texture among already loaded ones
+        bool isMatchFound = false;
         for (Texture &t : loadedTextures) {
             if (t.getPath() == path) {
+                SPDLOG_INFO("Found match");
                 textures.push_back(t);
-                break;
+                isMatchFound = true;
             }
         }
 
         // load texture if it was not loaded yet
-        Texture texture{
-                typeName,
-                path
-        };
-        loadedTextures.push_back(texture);
-        textures.push_back(texture);
+        if (!isMatchFound) {
+            Texture texture{
+                    typeName,
+                    path
+            };
+            loadedTextures.push_back(texture);
+            textures.push_back(texture);
+        }
     }
     return textures;
 }

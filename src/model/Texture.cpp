@@ -2,9 +2,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 Texture::Texture(const std::string &name, const std::string &path) : type(name), path(path) {
-    std::cout << "[Texture] Loading texture: " << path << std::endl;
+    SPDLOG_INFO("Loading texture: {}", path);
 
     // load image
     int width, height, nrChannels;
@@ -28,6 +29,8 @@ Texture::Texture(const std::string &name, const std::string &path) : type(name),
     } else if (nrChannels == 4) {
         format = GL_RGBA;
     }
+    SPDLOG_INFO("Data format resolved to {}", format == GL_RGB ? "RGB" : format == GL_RGBA ? "RGBA" : "RED");
+
 
     // attach texture
     glBindTexture(GL_TEXTURE_2D, this->ID);

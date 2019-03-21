@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <random>
+#include <spdlog/spdlog.h>
 #include <iostream>
 #include "model/Texture.h"
 #include "core/Application.h"
@@ -31,15 +32,14 @@ void initializeGLFW() {
 int initializeGL() {
     // load OpenGL with GLAD
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
-        std::cout << "Failed to initialize OpenGL context" << std::endl;
         return -1;
     }
 
     // output graphics adapter information
-    std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
-    std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
-    std::cout << "Version: " << glGetString(GL_VERSION) << std::endl;
-    std::cout << "GLSL: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+    SPDLOG_INFO("Vendor: {}", glGetString(GL_VENDOR));
+    SPDLOG_INFO("Renderer: {}", glGetString(GL_RENDERER));
+    SPDLOG_INFO("Version: {}", glGetString(GL_VERSION));
+    SPDLOG_INFO("GLSL: {}", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     // enable depth buffer
     glEnable(GL_DEPTH_TEST);
@@ -204,16 +204,16 @@ void startGameLoop(GLFWwindow* window, Application &app) {
     GLuint cube = createVertexBuffer();
     GLuint light = createLightArrayObject(cube);
     glm::vec3 pointLightPositions[] = {
-            glm::vec3( 5.7f, 2.75f, 4.0f),
-            glm::vec3( 3.3f, -1.f, -4.0f),
+            glm::vec3( 15.7f, 2.75f, 4.0f),
+            glm::vec3( 13.3f, -1.f, -4.0f),
             glm::vec3(-5.0f, 6.0f, -1.0f),
-            glm::vec3( 1.25f, 1.75f, -3.0f)
+            glm::vec3( 10.25f, 1.75f, -3.0f)
     };
 
     // create textures and shaders
     Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
     Shader lightShader = Shader("light/vertex.glsl", "light/fragment.glsl");
-    Model objectModel{"assets/nanosuit/nanosuit.obj"};
+    Model objectModel{"assets/Ambassador/Ambassador Class.obj"};
     Light lightSpecs = getLight();
 
     while(!glfwWindowShouldClose(window)) {
@@ -285,11 +285,15 @@ void startGameLoop(GLFWwindow* window, Application &app) {
 
 // Entry point
 int main(int argc, char **argv) {
+    // Initialize logger
+    spdlog::set_pattern("%l [%s] %v");
+    SPDLOG_INFO("Initializing application...");
+
     // Create window
     initializeGLFW();
     GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
     if (window == nullptr) {
-        std::cerr << "Failed to create a window" << std::endl;
+        SPDLOG_ERROR("Failed to create a window, terminating...");
         glfwTerminate();
         return -1;
     }
@@ -311,13 +315,16 @@ int main(int argc, char **argv) {
 
     // Initialize OpenGL
     if (initializeGL() != 0) {
+        SPDLOG_ERROR("Failed to initialize OpenGL");
         return -1;
     }
 
     // Start game loop
+    SPDLOG_INFO("Starting game loop...");
     startGameLoop(window, Application::getSingleton());
 
     // Terminate GLFW
+    SPDLOG_INFO("Terminating...");
     glfwTerminate();
     return 0;
 }

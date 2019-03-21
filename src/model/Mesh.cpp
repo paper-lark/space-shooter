@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include <spdlog/spdlog.h>
 #include <iostream>
 
 void Mesh::setupMesh() {
@@ -26,7 +27,7 @@ void Mesh::setupMesh() {
 
     // bind array
     glBindVertexArray(0);
-    std::cout << "[MESH] Created mesh with  {" << vbo << "} {" << vao << "}" << std::endl;
+    SPDLOG_INFO("Created mesh with {} vertices: {}", vertices.size(), vao);
 }
 
 void Mesh::Draw(Shader shader) const {
@@ -38,7 +39,7 @@ void Mesh::Draw(Shader shader) const {
     unsigned current = 0;
     for (const Texture &texture : textures) {
         std::string number;
-        const std::string name = texture.getName();
+        const std::string &name = texture.getName();
         texture.bind(GL_TEXTURE0 + current);
 
         if (name == "texture_diffuse") {
@@ -48,11 +49,10 @@ void Mesh::Draw(Shader shader) const {
         } else if (name == "texture_emission") {
             number = std::to_string(currentEmission++);
         } else {
-            std::cerr << "Unknown texture type: " << name << std::endl;
+            throw std::runtime_error("Unknown texture type: " + name);
         }
 
         std::string uniformLabel = std::string("material.").append(name).append(number);
-        std::cout << "[MESH] Using texture {" << texture.getPath()  << "} as {" << uniformLabel << "}" << std::endl;
         shader.setFloat(uniformLabel, current);
         current++;
     }
