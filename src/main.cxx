@@ -187,16 +187,17 @@ Light getLight() {
 }
 
 // Get object source model matrix (local -> world)
-glm::mat4 getObjectModelMatrix() {
+glm::mat4 getObjectModelMatrix(glm::vec3 pos) {
     glm::mat4 matrix = glm::mat4(1.f);
+    matrix = glm::translate(matrix, pos);
     return glm::scale(matrix, glm::vec3(0.0005f, 0.0005f, 0.0005f));
 }
 
 
 // Get light source model matrix (local -> world)
-glm::mat4 getLightModelMatrix(glm::vec3 lightPosition) {
+glm::mat4 getLightModelMatrix(glm::vec3 pos) {
     glm::mat4 matrix = glm::mat4(1.f);
-    matrix = glm::translate(matrix, lightPosition);
+    matrix = glm::translate(matrix, pos);
     return glm::scale(matrix, glm::vec3(0.1f, 0.1f, 0.1f));
 }
 
@@ -324,6 +325,16 @@ void startGameLoop(GLFWwindow* window, Application &app) {
             glm::vec3( 10.25f, 1.75f, -3.0f)
     };
 
+
+    glm::vec3 objPosition[] = {
+            glm::vec3(1.f, 0.f, 1.f),
+            glm::vec3(3.f, 1.f, 3.f),
+            glm::vec3(2.f, 5.f, -1.f),
+            glm::vec3(1.f, -2.f, -3.f),
+            glm::vec3(5.f, 2.f, 2.f),
+            glm::vec3(-5.f, -2.f, -2.f),
+    };
+
     // create textures and shaders
     Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
     Shader lightShader = Shader("light/vertex.glsl", "light/fragment.glsl");
@@ -348,7 +359,6 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         objShader.setMatrix("view", app.camera.getViewMatrix());
         objShader.setMatrix("projection", app.camera.getProjectionMatrix());
         objShader.setVec3("viewPos", app.camera.getPos());
-        objShader.setMatrix("model", getObjectModelMatrix());
 
         objShader.setVec3("dirLight.direction", glm::vec3(0.f, 10.f, 5.f));
         objShader.setVec3("dirLight.diffuse", lightSpecs.diffuse);
@@ -366,7 +376,7 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         objShader.setFloat("flashlight.linear", lightSpecs.linear);
         objShader.setFloat("flashlight.quadratic", lightSpecs.quadratic);
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < sizeof(pointLightPositions); i++) {
             std::string prefix = "pointLights[" + std::to_string(i) + "]";
             objShader.setVec3(prefix + ".position", pointLightPositions[i]);
             objShader.setVec3(prefix + ".diffuse", lightSpecs.diffuse);
@@ -377,12 +387,15 @@ void startGameLoop(GLFWwindow* window, Application &app) {
             objShader.setFloat(prefix + ".quadratic", lightSpecs.quadratic);
         }
 
-        objectModel.Draw(objShader);
+        for (int i = 0; i < sizeof(objPosition); i++) {
+            objShader.setMatrix("model", getObjectModelMatrix(objPosition[i]));
+            objectModel.Draw(objShader);
+        }
 
 
         // draw light sources
         lightShader.use();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < sizeof(pointLightPositions); i++) {
             lightShader.setMatrix("model", getLightModelMatrix(pointLightPositions[i]));
             lightShader.setMatrix("view", app.camera.getViewMatrix());
             lightShader.setMatrix("projection", app.camera.getProjectionMatrix());
@@ -425,7 +438,7 @@ int main(int argc, char **argv) {
         return -1;
     }
     glfwMakeContextCurrent(window);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // attach cursor to the window
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // Initialize application
     Application::initialize(window);
