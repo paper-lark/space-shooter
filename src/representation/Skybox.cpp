@@ -3,72 +3,59 @@
 
 
 static float vertices[] = {
-        // positions
         -1.0f,  1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f,
         1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
         1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
 
         -1.0f, -1.0f,  1.0f,
         -1.0f, -1.0f, -1.0f,
         -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
         -1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
 
         1.0f, -1.0f, -1.0f,
         1.0f, -1.0f,  1.0f,
         1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
         1.0f,  1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
 
         -1.0f, -1.0f,  1.0f,
         -1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
         1.0f,  1.0f,  1.0f,
         1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
 
         -1.0f,  1.0f, -1.0f,
         1.0f,  1.0f, -1.0f,
         1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
         -1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f, -1.0f,
 
         -1.0f, -1.0f, -1.0f,
         -1.0f, -1.0f,  1.0f,
         1.0f, -1.0f, -1.0f,
-        1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
         1.0f, -1.0f,  1.0f
 };
 
 
 static unsigned indices[] = {
         0, 1, 2,
-        3, 4, 5,
+        2, 3, 0,
 
-        6, 7, 8,
-        9, 10, 11,
+        4, 5, 6,
+        6, 7, 4,
+
+        8, 9, 10,
+        10, 11, 8,
 
         12, 13, 14,
-        15, 16, 17,
+        14, 15, 12,
 
-        18, 19, 20,
-        21, 22, 23,
+        16, 17, 18,
+        18, 19, 16,
 
-        24, 25, 26,
-        27, 28, 29,
+        20, 21, 22,
+        22, 21, 23
+};
 
-        30, 31, 32,
-        33, 34, 35
-}; // TODO: reuse vertices
-
-Skybox::Skybox(const std::vector<std::string> &faces) : texture("texture_diffuse", faces) {
+Skybox::Skybox(const std::vector<std::string> &faces, const Shader shader) : shader(shader), texture("texture_diffuse", faces) {
     glGenVertexArrays(1, &mesh);
     glBindVertexArray(mesh);
 
@@ -93,5 +80,6 @@ void Skybox::Draw(const Camera &camera) {
     shader.setMatrix("projection", camera.getProjectionMatrix());
     texture.bind(GL_TEXTURE0);
     glBindVertexArray(mesh);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(0);
 }

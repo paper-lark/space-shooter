@@ -9,12 +9,12 @@
 #include "Mesh.h"
 
 class Skybox {
-    Shader shader = Shader("skybox/vertex.glsl", "skybox/fragment.glsl"); // TODO: move out
+    Shader shader;
     Texture texture;
     GLuint mesh;
 
 public:
-    explicit Skybox(const std::vector<std::string> &faces);
+    explicit Skybox(const std::vector<std::string> &faces, const Shader shader);
 
     void Draw(const Camera &camera);
 };

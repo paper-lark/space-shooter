@@ -176,7 +176,7 @@ void startGameLoop(GLFWwindow* window, Application &app) {
             "assets/Skybox/lightblue/front.png",
             "assets/Skybox/lightblue/back.png"
     };
-    Skybox skybox{textures_faces};
+    Skybox skybox{textures_faces, Shader("skybox/vertex.glsl", "skybox/fragment.glsl")};
 
     // create textures and shaders
     Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl"); // TODO: move shader to object
