@@ -14,7 +14,7 @@ glm::mat4 Camera::getProjectionMatrix() const {
             glm::radians(fov),
             float(Callback::windowSize[0]) / Callback::windowSize[1],
             0.1f,
-            100.0f
+            250.0f
     );
 }
 

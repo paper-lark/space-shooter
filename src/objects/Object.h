@@ -12,7 +12,8 @@ class Object {
     glm::mat4 getObjectModelMatrix() const {
         glm::mat4 matrix = glm::mat4(1.f);
         matrix = glm::translate(matrix, position);
-        return glm::scale(matrix, glm::vec3(0.0005f, 0.0005f, 0.0005f)); // TODO: move scaling somewhere else
+        matrix = glm::scale(matrix, glm::vec3(0.005f, 0.005f, 0.005f));
+        return matrix; // TODO: move scaling somewhere else
     }
 
 public:

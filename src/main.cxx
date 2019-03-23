@@ -16,6 +16,7 @@
 #include "objects/Spaceship.h"
 #include "representation/Skybox.h"
 
+#define length(x)  (sizeof(x) / sizeof((x)[0]))
 #define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH 800
 #define WINDOW_TITLE "OpenGL Introduction"
@@ -141,31 +142,30 @@ Light getLight() {
 
 
 // Get light source model matrix (local -> world)
-glm::mat4 getLightModelMatrix(glm::vec3 pos) {
+glm::mat4 getLightModelMatrix(const glm::vec3 position) {
     glm::mat4 matrix = glm::mat4(1.f);
-    matrix = glm::translate(matrix, pos);
-    return glm::scale(matrix, glm::vec3(0.1f, 0.1f, 0.1f));
+    matrix = glm::translate(matrix, position);
+    matrix = glm::scale(matrix, glm::vec3(30, 30, 30));
+    return matrix;
 }
 
 // Start game loop that ends when GLFW is signaled to close
 void startGameLoop(GLFWwindow* window, Application &app) {
     // create prerequisites
-    GLuint cube = createVertexBuffer();
-    GLuint light = createLightArrayObject(cube);
-    glm::vec3 pointLightPositions[] = {
-            glm::vec3( 15.7f, 2.75f, 4.0f),
-            glm::vec3( 13.3f, -1.f, -4.0f),
-            glm::vec3(-15.0f, 6.0f, -1.0f),
-            glm::vec3( 10.25f, 1.75f, -3.0f)
+    glm::vec3 lightPositions[] = {
+            glm::vec3( 105.7f, 13.75f, 19.0f),
+            glm::vec3( 123.3f, -50.f, -55.0f),
+            glm::vec3(-35.0f, 76.0f, 83.0f),
+            glm::vec3( -58.25f, 33.75f, -143.0f)
     };
 
-    Spaceship spaceships[] = {
-            Spaceship(100, glm::vec3(1.f, 0.f, 1.f)),
-            Spaceship(100, glm::vec3(3.f, 1.f, 3.f)),
-            Spaceship(100, glm::vec3(2.f, 5.f, -1.f)),
-            Spaceship(100, glm::vec3(1.f, -2.f, -3.f)),
-            Spaceship(100, glm::vec3(5.f, 2.f, 2.f)),
-            Spaceship(100, glm::vec3(-5.f, -2.f, -2.f)),
+    std::vector<Spaceship> spaceships = {
+            Spaceship(100, glm::vec3(10.f, 6.f, -15.f)),
+            Spaceship(100, glm::vec3(23.f, 11.f, 3.f)),
+            Spaceship(100, glm::vec3(12.f, 5.f, -1.f)),
+            Spaceship(100, glm::vec3(1.f, -12.f, -13.f)),
+            Spaceship(100, glm::vec3(15.f, 2.f, 22.f)),
+            Spaceship(100, glm::vec3(-5.f, -12.f, -32.f)),
     };
 
     std::vector<std::string> textures_faces = {
@@ -177,6 +177,7 @@ void startGameLoop(GLFWwindow* window, Application &app) {
             "assets/Skybox/lightblue/back.png"
     };
     Skybox skybox{textures_faces, Shader("skybox/vertex.glsl", "skybox/fragment.glsl")};
+    Model starModel{"assets/Star/Mercury 1K.obj"}; // TODO: move to object
 
     // create textures and shaders
     Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl"); // TODO: move shader to object
@@ -213,9 +214,9 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         objShader.setFloat("flashlight.linear", lightSpecs.linear);
         objShader.setFloat("flashlight.quadratic", lightSpecs.quadratic);
 
-        for (int i = 0; i < sizeof(pointLightPositions); i++) {
+        for (int i = 0; i < length(lightPositions); i++) {
             std::string prefix = "pointLights[" + std::to_string(i) + "]";
-            objShader.setVec3(prefix + ".position", pointLightPositions[i]);
+            objShader.setVec3(prefix + ".position", lightPositions[i]);
             objShader.setVec3(prefix + ".diffuse", lightSpecs.diffuse);
             objShader.setVec3(prefix + ".ambient", lightSpecs.ambient);
             objShader.setVec3(prefix + ".specular", lightSpecs.specular);
@@ -231,13 +232,11 @@ void startGameLoop(GLFWwindow* window, Application &app) {
 
         // draw light sources
         lightShader.use();
-        for (int i = 0; i < sizeof(pointLightPositions); i++) {
-            lightShader.setMatrix("model", getLightModelMatrix(pointLightPositions[i]));
-            lightShader.setMatrix("view", app.camera.getViewMatrix());
-            lightShader.setMatrix("projection", app.camera.getProjectionMatrix());
-            lightShader.setVec3("lightColor", glm::vec3(1.f, 1.f, 1.f));
-            glBindVertexArray(light);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+        lightShader.setMatrix("view", app.camera.getViewMatrix());
+        lightShader.setMatrix("projection", app.camera.getProjectionMatrix());
+        for (int i = 0; i < length(lightPositions); i++) {
+            lightShader.setMatrix("model", getLightModelMatrix(lightPositions[i]));
+            starModel.Draw(lightShader);
         }
 
         // draw skybox
@@ -247,10 +246,6 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         glfwSwapBuffers(window); // swap front and back color buffers
         glfwPollEvents(); // process all events
     }
-
-    // release resources
-    glDeleteVertexArrays(1, &light);
-    glDeleteBuffers(1, &cube);
 }
 
 // Entry point
