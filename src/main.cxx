@@ -50,76 +50,6 @@ int initializeGL() {
     return 0;
 }
 
-// Create vertex buffer with a rectangle
-GLuint createVertexBuffer() {
-    float vertices[] = {
-            // positions          // normals           // texture coords
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-             0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-
-            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
-    };
-
-    GLuint vertexBufferObject;
-    glGenBuffers(1, &vertexBufferObject); // generate object
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject); // bind buffer to a vertex buffer type
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // load vertex data into buffer
-
-    return vertexBufferObject;
-}
-
-// Create light source VAO
-GLuint createLightArrayObject(GLuint vbo) {
-    // create vertex array object
-    GLuint lightVAO;
-    glGenVertexArrays(1, &lightVAO);
-    glBindVertexArray(lightVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    // specify how to interpret vertex data from currently bound VBO
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
-    glEnableVertexAttribArray(0);
-
-    return lightVAO;
-}
-
 struct Light {
     glm::vec3 ambient;
     glm::vec3 diffuse;
@@ -160,12 +90,12 @@ void startGameLoop(GLFWwindow* window, Application &app) {
     };
 
     std::vector<Spaceship> spaceships = {
-            Spaceship(100, glm::vec3(10.f, 6.f, -15.f)),
-            Spaceship(100, glm::vec3(23.f, 11.f, 3.f)),
-            Spaceship(100, glm::vec3(12.f, 5.f, -1.f)),
-            Spaceship(100, glm::vec3(1.f, -12.f, -13.f)),
-            Spaceship(100, glm::vec3(15.f, 2.f, 22.f)),
-            Spaceship(100, glm::vec3(-5.f, -12.f, -32.f)),
+            {100, glm::vec3(10.f, 6.f, -15.f)},
+            {100, glm::vec3(23.f, 11.f, 3.f)},
+            {1000, glm::vec3(12.f, 5.f, -1.f)},
+            {100, glm::vec3(1.f, -12.f, -13.f)},
+            {10000, glm::vec3(15.f, 2.f, 22.f)},
+            {10000, glm::vec3(-5.f, -12.f, -32.f)},
     };
 
     std::vector<std::string> textures_faces = {
@@ -180,7 +110,7 @@ void startGameLoop(GLFWwindow* window, Application &app) {
     Model starModel{"assets/Star/Mercury 1K.obj"}; // TODO: move to object
 
     // create textures and shaders
-    Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl"); // TODO: move shader to object
+    Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
     Shader lightShader = Shader("light/vertex.glsl", "light/fragment.glsl");
     Light lightSpecs = getLight();
 
@@ -225,8 +155,9 @@ void startGameLoop(GLFWwindow* window, Application &app) {
             objShader.setFloat(prefix + ".quadratic", lightSpecs.quadratic);
         }
 
-        for (const Spaceship &ship: spaceships) {
+        for (Spaceship &ship: spaceships) {
             ship.Draw(objShader);
+            ship.Update(app.getDeltaTime());
         }
 
 
@@ -245,13 +176,19 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         // update color buffers
         glfwSwapBuffers(window); // swap front and back color buffers
         glfwPollEvents(); // process all events
+
+        // remove all dead objects
+        spaceships.erase(
+                std::remove_if(spaceships.begin(), spaceships.end(), [](const Spaceship &s){ return !s.IsAlive(); }),
+                spaceships.end()
+        );
     }
 }
 
 // Entry point
 int main(int argc, char **argv) {
     // Initialize logger
-    spdlog::set_pattern("%l [%s] %v");
+    spdlog::set_pattern("%T – %l [%s] %v");
     SPDLOG_INFO("Initializing application...");
 
     // Create window

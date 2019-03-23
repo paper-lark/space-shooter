@@ -23,6 +23,7 @@ public:
     void setMatrix(const std::string &name, glm::mat4 matrix) const;
     void setVec4(const std::string &name, glm::vec4 vector) const;
     void setVec3(const std::string &name, glm::vec3 vector) const;
+    void setUint(const std::string &name, unsigned value) const;
 };
 
 

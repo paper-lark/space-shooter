@@ -49,6 +49,7 @@ out vec4 FragColor;
 
 uniform vec3 viewPos;
 uniform Material material;
+uniform uint health;
 
 uniform DirectionalLight dirLight;
 uniform PointLight pointLights[POINT_LIGHTS_COUNT];
@@ -121,5 +122,8 @@ void main() {
 	}
 	light += calculateFlashlightLight(flashlight, normal, viewDir);
 
-    FragColor = vec4(light, 1.f);
+	// calculate health level
+	float healthLevel = min(health / 150.f + 0.25f, 1.f);
+
+    FragColor = vec4(light * healthLevel, 1.f);
 }

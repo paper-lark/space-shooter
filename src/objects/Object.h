@@ -8,23 +8,23 @@ class Object {
     const Model *model;
     unsigned health;
     glm::vec3 position;
+    float scale;
+    float yaw, pitch, roll;
 
-    glm::mat4 getObjectModelMatrix() const {
-        glm::mat4 matrix = glm::mat4(1.f);
-        matrix = glm::translate(matrix, position);
-        matrix = glm::scale(matrix, glm::vec3(0.005f, 0.005f, 0.005f));
-        return matrix; // TODO: move scaling somewhere else
-    }
+    // Get model matrix for the object
+    glm::mat4 getObjectModelMatrix() const;
 
 public:
-    Object(const Model *model, unsigned health, const glm::vec3 position): model(model), health(health), position(position) {
+    // Constructor
+    Object(const Model *model, unsigned health, glm::vec3 position, float scale = 1, float yaw = 0, float pitch = 0, float roll = 0)
+        : model(model), health(health), position(position), scale(scale), yaw(yaw), pitch(pitch), roll(roll) {
         SPDLOG_INFO("Created");
     }
 
-    void Move(const glm::vec3 vec) {
-        position += vec;
-    }
+    // Move object in the specified direction
+    void Move(glm::vec3 vec);
 
+    // Apply damage to the object. Returns true if object is still alive and false otherwise.
     bool ApplyDamage(unsigned damage) {
         if (health > damage) {
             health -= damage;
@@ -35,15 +35,19 @@ public:
         }
     }
 
-    bool IsAlive() const {
-        return health > 0;
-    }
+    // Get object direction
+    glm::vec3 getDirection() const;
 
-    void Draw(Shader &shader) const {
-        shader.setMatrix("model", this->getObjectModelMatrix());
-        model->Draw(shader);
-    }
+    // Get a flag whether the object is still alive
+    bool IsAlive() const;
 
+    // Draw object
+    void Draw(Shader &shader) const;
+
+    // Update object. Should be called on each frame
+    void Update(float deltaTime);
+
+    // Destructor
     ~Object() {
         SPDLOG_INFO("Destructed");
     }

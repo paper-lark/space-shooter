@@ -13,7 +13,7 @@ public:
 
     static void Release();
 
-    Spaceship(unsigned health, const glm::vec3 position): Object(spaceshipModel, health, position) {}
+    Spaceship(unsigned health, const glm::vec3 position): Object(spaceshipModel, health, position, 0.005f) {}
 };
 
 
