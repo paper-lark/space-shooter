@@ -8,6 +8,7 @@
 #define CHECK_MESH(mesh) if (mesh->mNormals == nullptr) { throw std::runtime_error("Missing normals on the mesh"); } else if (mesh->mTextureCoords == nullptr) { throw std::runtime_error("Missing texture coordinates on the mesh"); }
 
 void Model::loadModel(const string &path) {
+    SPDLOG_INFO("Loading model: {}", path);
     Assimp::Importer importer;
     const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs |
             aiProcess_GenNormals);
@@ -25,7 +26,6 @@ void Model::processNode(const aiNode *node, const aiScene *scene) {
     for(unsigned i = 0; i < node->mNumMeshes; i++) {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.push_back(processMesh(mesh, scene));
-        SPDLOG_INFO("Current mesh count: {}", meshes.size());
     }
 
     // repeat process for all its children
@@ -93,7 +93,7 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type,
         aiString localPath;
         mat->GetTexture(type, i, &localPath);
         std::string path = directory + std::string("/").append(localPath.C_Str());
-        SPDLOG_INFO("Searching for material: {}", path);
+        SPDLOG_DEBUG("Searching for material: {}", path);
 
         // look for texture among already loaded ones
         bool isMatchFound = false;
@@ -118,7 +118,7 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type,
     return textures;
 }
 
-void Model::Draw(Shader &shader) {
+void Model::Draw(Shader &shader) const {
     for (const Mesh &mesh : meshes) {
         mesh.Draw(shader);
     }

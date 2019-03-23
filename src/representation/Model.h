@@ -5,7 +5,7 @@
 #include <assimp/scene.h>
 #include <string>
 #include "Mesh.h"
-#include "../utils/Shader.h"
+#include "Shader.h"
 
 using std::vector;
 using std::string;
@@ -25,7 +25,7 @@ public:
         loadModel(path);
     }
 
-    void Draw(Shader &shader);
+    void Draw(Shader &shader) const;
 };
 
 

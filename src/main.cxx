@@ -7,13 +7,15 @@
 #include <random>
 #include <spdlog/spdlog.h>
 #include <iostream>
-#include "model/Texture.h"
+#include "representation/Texture.h"
 #include "core/Application.h"
 #include "core/Callback.h"
-#include "utils/Shader.h"
+#include "representation/Shader.h"
 #include "core/Camera.h"
-#include "model/Model.h"
-#include <stb_image.h>
+#include "representation/Model.h"
+#include "objects/Spaceship.h"
+#include "representation/Skybox.h"
+
 #define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH 800
 #define WINDOW_TITLE "OpenGL Introduction"
@@ -37,10 +39,8 @@ int initializeGL() {
     }
 
     // output graphics adapter information
-    SPDLOG_INFO("Vendor: {}", glGetString(GL_VENDOR));
-    SPDLOG_INFO("Renderer: {}", glGetString(GL_RENDERER));
-    SPDLOG_INFO("Version: {}", glGetString(GL_VERSION));
-    SPDLOG_INFO("GLSL: {}", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    SPDLOG_DEBUG("Device info: {}", glGetString(GL_RENDERER));
+    SPDLOG_DEBUG("OpenGL Version: {}, {}", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
 
     // enable depth buffer
     glEnable(GL_DEPTH_TEST);
@@ -104,53 +104,6 @@ GLuint createVertexBuffer() {
     return vertexBufferObject;
 }
 
-// Create element buffer object
-// Using EBO allows indexed drawing to prevent storing redundant vertices when drawing complex shapes
-GLuint createElementBufferObject() {
-    unsigned int indices[] = {
-            0, 1, 3,
-            1, 3, 2,
-            1, 2, 6,
-            1, 5, 6,
-            1, 5, 4,
-            1, 0, 4,
-            0, 3, 7,
-            0, 4, 7,
-            2, 6, 7,
-            2, 3, 7,
-            5, 4, 7,
-            5, 6, 7
-    };
-
-    GLuint elementBufferObject;
-    glGenBuffers(1, &elementBufferObject);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObject);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    return elementBufferObject;
-}
-
-// Create vertex array object
-// Using VAO allows to configure vertex attribute pointers once and for all
-GLuint createVertexArrayObject(GLuint vbo) {
-    // create vertex array object
-    GLuint vertexArrayObject;
-    glGenVertexArrays(1, &vertexArrayObject);
-    glBindVertexArray(vertexArrayObject);
-    createVertexBuffer();
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    // specify how to interpret vertex data from currently bound VBO
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-    return vertexArrayObject;
-}
-
 // Create light source VAO
 GLuint createLightArrayObject(GLuint vbo) {
     // create vertex array object
@@ -186,131 +139,12 @@ Light getLight() {
     };
 }
 
-// Get object source model matrix (local -> world)
-glm::mat4 getObjectModelMatrix(glm::vec3 pos) {
-    glm::mat4 matrix = glm::mat4(1.f);
-    matrix = glm::translate(matrix, pos);
-    return glm::scale(matrix, glm::vec3(0.0005f, 0.0005f, 0.0005f));
-}
-
 
 // Get light source model matrix (local -> world)
 glm::mat4 getLightModelMatrix(glm::vec3 pos) {
     glm::mat4 matrix = glm::mat4(1.f);
     matrix = glm::translate(matrix, pos);
     return glm::scale(matrix, glm::vec3(0.1f, 0.1f, 0.1f));
-}
-
-
-GLuint createSkyboxTexture() {
-    // create texture object
-    GLuint textureId;
-    glGenTextures(1, &textureId);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
-    vector<string> textures_faces = {
-            "assets/Skybox/lightblue/right.png",
-            "assets/Skybox/lightblue/left.png",
-            "assets/Skybox/lightblue/top.png",
-            "assets/Skybox/lightblue/bot.png",
-            "assets/Skybox/lightblue/front.png",
-            "assets/Skybox/lightblue/back.png"
-    };
-
-    // load faces
-    int width, height, nrChannels;
-    unsigned char *data;
-    for(GLuint i = 0; i < textures_faces.size(); i++) {
-
-        data = stbi_load(textures_faces[i].c_str(), &width, &height, &nrChannels, 0);
-
-        // decide format
-        GLenum format = GL_RGB;
-        if (nrChannels == 1) {
-            format = GL_RED;
-        } else if (nrChannels == 3) {
-            format = GL_RGB;
-        } else if (nrChannels == 4) {
-            format = GL_RGBA;
-        }
-
-        glTexImage2D(
-                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data
-        );
-        stbi_image_free(data);
-    }
-
-    // specify filtering parameters
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-    return textureId;
-}
-
-
-GLuint createSkyboxMesh() {
-    float vertices[] = {
-            // positions
-            -1.0f,  1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
-
-            -1.0f, -1.0f,  1.0f,
-            -1.0f, -1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f,  1.0f,
-            -1.0f, -1.0f,  1.0f,
-
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-
-            -1.0f, -1.0f,  1.0f,
-            -1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f, -1.0f,  1.0f,
-            -1.0f, -1.0f,  1.0f,
-
-            -1.0f,  1.0f, -1.0f,
-            1.0f,  1.0f, -1.0f,
-            1.0f,  1.0f,  1.0f,
-            1.0f,  1.0f,  1.0f,
-            -1.0f,  1.0f,  1.0f,
-            -1.0f,  1.0f, -1.0f,
-
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f,  1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f,  1.0f,
-            1.0f, -1.0f,  1.0f
-    };
-    GLuint vbo;
-    glGenBuffers(1, &vbo); // generate object
-    glBindBuffer(GL_ARRAY_BUFFER, vbo); // bind buffer to a vertex buffer type
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // load vertex data into buffer
-
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    // specify how to interpret vertex data from currently bound VBO
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
-    glEnableVertexAttribArray(0);
-
-    return vao;
 }
 
 // Start game loop that ends when GLFW is signaled to close
@@ -325,26 +159,29 @@ void startGameLoop(GLFWwindow* window, Application &app) {
             glm::vec3( 10.25f, 1.75f, -3.0f)
     };
 
-
-    glm::vec3 objPosition[] = {
-            glm::vec3(1.f, 0.f, 1.f),
-            glm::vec3(3.f, 1.f, 3.f),
-            glm::vec3(2.f, 5.f, -1.f),
-            glm::vec3(1.f, -2.f, -3.f),
-            glm::vec3(5.f, 2.f, 2.f),
-            glm::vec3(-5.f, -2.f, -2.f),
+    Spaceship spaceships[] = {
+            Spaceship(100, glm::vec3(1.f, 0.f, 1.f)),
+            Spaceship(100, glm::vec3(3.f, 1.f, 3.f)),
+            Spaceship(100, glm::vec3(2.f, 5.f, -1.f)),
+            Spaceship(100, glm::vec3(1.f, -2.f, -3.f)),
+            Spaceship(100, glm::vec3(5.f, 2.f, 2.f)),
+            Spaceship(100, glm::vec3(-5.f, -2.f, -2.f)),
     };
 
-    // create textures and shaders
-    Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
-    Shader lightShader = Shader("light/vertex.glsl", "light/fragment.glsl");
-    Shader skyboxShader = Shader("skybox/vertex.glsl", "skybox/fragment.glsl");
-    Model objectModel{"assets/Spaceship/Arc170.obj"};
-    Light lightSpecs = getLight();
+    std::vector<std::string> textures_faces = {
+            "assets/Skybox/lightblue/right.png",
+            "assets/Skybox/lightblue/left.png",
+            "assets/Skybox/lightblue/top.png",
+            "assets/Skybox/lightblue/bot.png",
+            "assets/Skybox/lightblue/front.png",
+            "assets/Skybox/lightblue/back.png"
+    };
+    Skybox skybox{textures_faces};
 
-    // setup skybox
-    GLuint skyboxTexture = createSkyboxTexture();
-    GLuint skyboxMesh = createSkyboxMesh();
+    // create textures and shaders
+    Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl"); // TODO: move shader to object
+    Shader lightShader = Shader("light/vertex.glsl", "light/fragment.glsl");
+    Light lightSpecs = getLight();
 
     while(!glfwWindowShouldClose(window)) {
         // update application
@@ -387,9 +224,8 @@ void startGameLoop(GLFWwindow* window, Application &app) {
             objShader.setFloat(prefix + ".quadratic", lightSpecs.quadratic);
         }
 
-        for (int i = 0; i < sizeof(objPosition); i++) {
-            objShader.setMatrix("model", getObjectModelMatrix(objPosition[i]));
-            objectModel.Draw(objShader);
+        for (const Spaceship &ship: spaceships) {
+            ship.Draw(objShader);
         }
 
 
@@ -405,13 +241,7 @@ void startGameLoop(GLFWwindow* window, Application &app) {
         }
 
         // draw skybox
-        skyboxShader.use();
-        glm::mat4 view = glm::mat4(glm::mat3(app.camera.getViewMatrix()));
-        skyboxShader.setMatrix("view", view);
-        skyboxShader.setMatrix("projection", app.camera.getProjectionMatrix());
-        glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
-        glBindVertexArray(skyboxMesh);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        skybox.Draw(app.camera);
 
         // update color buffers
         glfwSwapBuffers(window); // swap front and back color buffers
@@ -459,12 +289,17 @@ int main(int argc, char **argv) {
         return -1;
     }
 
+    // Load all models
+    SPDLOG_INFO("Loading models...");
+    Spaceship::Init();
+
     // Start game loop
     SPDLOG_INFO("Starting game loop...");
     startGameLoop(window, Application::getSingleton());
 
     // Terminate GLFW
     SPDLOG_INFO("Terminating...");
+    Spaceship::Release();
     glfwTerminate();
     return 0;
 }

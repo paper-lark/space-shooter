@@ -27,7 +27,7 @@ void Mesh::setupMesh() {
 
     // bind array
     glBindVertexArray(0);
-    SPDLOG_INFO("Created mesh with {} vertices: {}", vertices.size(), vao);
+    SPDLOG_DEBUG("Created mesh with {} vertices ({})", vertices.size(), vao);
 }
 
 void Mesh::Draw(Shader shader) const {

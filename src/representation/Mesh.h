@@ -7,7 +7,7 @@
 #include <glad/glad.h>
 #include <vector>
 #include "Texture.h"
-#include "../utils/Shader.h"
+#include "Shader.h"
 
 using std::vector;
 

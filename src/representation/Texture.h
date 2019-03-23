@@ -6,13 +6,18 @@
 
 class Texture {
     GLuint ID;        // texture object ID
-    std::string type; // texture type TODO: refactor into type enum
+    std::string mapType; // map type TODO: refactor into type enum
     std::string path;
+    GLuint textureType; // texture type
+
+    void bindImage(GLenum target, const std::string &path);
+
 public:
     Texture(const std::string &type, const std::string &path);
+    Texture(const std::string &type, const std::vector<std::string> &path);
     void bind(GLenum texture = GL_TEXTURE0) const;
     const std::string &getName() const {
-        return type;
+        return mapType;
     }
 
     GLuint getID() const {
