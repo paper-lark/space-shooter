@@ -1,12 +1,8 @@
 #ifndef SPACESHOOTER_TEXTUREMAPTYPE_H
 #define SPACESHOOTER_TEXTUREMAPTYPE_H
 
-
 #include <string>
 
-enum class TextureMapType {
-    Diffuse, Emission, Specular
-};
+enum class TextureMapType { Diffuse, Emission, Specular };
 
-
-#endif //SPACESHOOTER_TEXTUREMAPTYPE_H
+#endif // SPACESHOOTER_TEXTUREMAPTYPE_H
