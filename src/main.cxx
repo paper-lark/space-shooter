@@ -1,9 +1,11 @@
 #define GL_SILENCE_DEPRECATION
 #define GLFW_INCLUDE_NONE
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_INFO
 
 #include "core/Application.h"
 #include "core/Callback.h"
 #include "core/Camera.h"
+#include "objects/Player.h"
 #include "objects/Spaceship.h"
 #include "representation/Model.h"
 #include "representation/Shader.h"
@@ -89,6 +91,8 @@ void startGameLoop(GLFWwindow *window, Application &app) {
       {100, glm::vec3(10.f, 6.f, -15.f)},  {100, glm::vec3(23.f, 11.f, 3.f)},   {1000, glm::vec3(12.f, 5.f, -1.f)},
       {100, glm::vec3(1.f, -12.f, -13.f)}, {10000, glm::vec3(15.f, 2.f, 22.f)}, {10000, glm::vec3(-5.f, -12.f, -32.f)},
   };
+  Player player{1000, glm::vec3(0.f, 0.f, 0.f)};
+  app.bindPlayer(&player);
 
   std::vector<std::string> textures_faces = {"assets/Skybox/lightblue/right.png", "assets/Skybox/lightblue/left.png",
                                              "assets/Skybox/lightblue/top.png",   "assets/Skybox/lightblue/bot.png",
@@ -105,9 +109,12 @@ void startGameLoop(GLFWwindow *window, Application &app) {
     // update application
     app.update();
 
+    // update camera position
+    app.camera.updatePosition(player.getPosition() - player.getDirection() * 10.f);
+
     // clear screen
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(unsigned(GL_COLOR_BUFFER_BIT) | unsigned(GL_DEPTH_BUFFER_BIT));
 
     // draw object
     objShader.use();
@@ -146,6 +153,7 @@ void startGameLoop(GLFWwindow *window, Application &app) {
       ship.Draw(objShader);
       ship.Update(app.getDeltaTime());
     }
+    player.Draw(objShader);
 
     // draw light sources
     lightShader.use();
@@ -168,6 +176,9 @@ void startGameLoop(GLFWwindow *window, Application &app) {
         std::remove_if(spaceships.begin(), spaceships.end(), [](const Spaceship &s) { return !s.IsAlive(); }),
         spaceships.end());
   }
+
+  // unbind player
+  app.bindPlayer(nullptr);
 }
 
 // Entry point
@@ -175,6 +186,7 @@ int main(int argc, char **argv) {
   // Initialize logger
   spdlog::set_pattern("%T – %l [%s] %v");
   SPDLOG_INFO("Initializing application...");
+  SPDLOG_DEBUG("Some debug message");
 
   // Create window
   initializeGLFW();
@@ -206,6 +218,7 @@ int main(int argc, char **argv) {
   // Load all models
   SPDLOG_INFO("Loading models...");
   Spaceship::Init();
+  Player::Init();
 
   // Start game loop
   SPDLOG_INFO("Starting game loop...");
@@ -214,6 +227,7 @@ int main(int argc, char **argv) {
   // Terminate GLFW
   SPDLOG_INFO("Terminating...");
   Spaceship::Release();
+  Player::Release();
   glfwTerminate();
   return 0;
 }

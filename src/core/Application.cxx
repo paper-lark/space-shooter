@@ -36,15 +36,18 @@ void Application::processKeyboardInput() {
 
 // Process mouse input
 void Application::processMouseInput(GLFWwindow *, double posX, double posY) {
-  static double lastX = posX, lastY = posY;
+  if (player != nullptr) {
+    static double lastX = posX, lastY = posY;
 
-  float offsetX = float(posX - lastX) * sensitivity;
-  float offsetY = float(posY - lastY) * sensitivity;
+    float offsetX = float(posX - lastX) * sensitivity;
+    float offsetY = float(posY - lastY) * sensitivity;
 
-  lastX = posX;
-  lastY = posY;
+    lastX = posX;
+    lastY = posY;
 
-  camera.updateRotation(offsetX, -offsetY);
+    camera.updateRotation(-offsetY, offsetX);
+    // TODO: implement rotation
+  }
 }
 
 // Update application
@@ -60,4 +63,9 @@ void Application::update() {
 // Get time passed from previous render
 float Application::getDeltaTime() const {
   return float(deltaTime);
+}
+
+// Bind player to the application
+void Application::bindPlayer(Player *p) {
+  player = p;
 }

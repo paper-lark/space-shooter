@@ -11,6 +11,11 @@ class Camera {
   const float speed = 0.5f; // camera movement speed
 
 public:
+
+  // Set camera position
+  // TODO: remove `move()`
+  void updatePosition(glm::vec3 pos);
+
   // Move camera
   void move(glm::vec3 direction);
 

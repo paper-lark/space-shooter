@@ -2,6 +2,7 @@
 #define SPACESHOOTER_APPLICATION_H
 
 #define GL_SILENCE_DEPRECATION
+#include "../objects/Player.h"
 #include "Camera.h"
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -11,6 +12,7 @@ private:
   GLFWwindow *window;
   double previousMoment = 0.0;
   double deltaTime = 0.0;
+  Player *player = nullptr;
   const float sensitivity = 0.05f; // mouse sensitivity
   static Application &instance;
 
@@ -32,6 +34,9 @@ public:
 
   // Get delta time from previous render
   float getDeltaTime() const;
+
+  // Bind player to the application
+  void bindPlayer(Player *p);
 
   // Initialize application singleton
   static void initialize(GLFWwindow *window) {

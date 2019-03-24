@@ -8,6 +8,11 @@ void Camera::move(glm::vec3 direction) {
   position += direction * speed;
 }
 
+// Set camera position
+void Camera::updatePosition(glm::vec3 pos) {
+  position = pos;
+}
+
 // Get projection matrix (view -> clip)
 glm::mat4 Camera::getProjectionMatrix() const {
   return glm::perspective(glm::radians(fov), float(Callback::windowSize[0]) / Callback::windowSize[1], 0.1f, 250.0f);
@@ -25,10 +30,10 @@ glm::mat4 Camera::getViewMatrix() const {
   return view;
 }
 
-// updateRotation updates pitch and yaw by specified delta values
-void Camera::updateRotation(float deltaYaw, float deltaPitch) {
-  pitch += deltaPitch;
-  yaw += deltaYaw;
+// updateRotation updates pitch and yaw by delta values
+void Camera::updateRotation(float p, float y) {
+  pitch += p;
+  yaw += y;
   if (pitch > 89.f) {
     pitch = 89.f;
   } else if (pitch < -89.f) {

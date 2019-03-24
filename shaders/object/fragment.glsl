@@ -62,7 +62,6 @@ vec3 calculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir
 	vec3 reflectDir = reflect(-lightDir, normal);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess * 128.0);
 
-	// TODO: move into a separate function
    	vec3 ambient = light.ambient * vec3(texture(material.texture_diffuse1, texCoords));
    	vec3 diffuse = light.diffuse * diff * vec3(texture(material.texture_diffuse1, texCoords));
    	vec3 specular = light.specular * spec * vec3(texture(material.texture_specular1, texCoords));
@@ -79,7 +78,6 @@ vec3 calculatePointLight(PointLight light, vec3 normal, vec3 viewDir) {
 	vec3 reflectDir = reflect(-lightDir, normal);
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess * 128.0);
 
-	// TODO: move into a separate function
 	vec3 ambient = light.ambient * vec3(texture(material.texture_diffuse1, texCoords));
 	vec3 diffuse = light.diffuse * diff * vec3(texture(material.texture_diffuse1, texCoords));
 	vec3 specular = light.specular * spec * vec3(texture(material.texture_specular1, texCoords));
@@ -97,7 +95,6 @@ vec3 calculateFlashlightLight(SpotlightLight light, vec3 normal, vec3 viewDir) {
 	float eps = light.innerCutOff - light.outerCutOff;
 	float intensity = clamp((theta - light.outerCutOff) / eps, 0.f, 1.f);
 
-	// TODO: move into a separate function
 	vec3 ambient = light.ambient * vec3(texture(material.texture_diffuse1, texCoords));
 	vec3 diffuse = light.diffuse * diff * vec3(texture(material.texture_diffuse1, texCoords));
 	vec3 specular = light.specular * spec * vec3(texture(material.texture_specular1, texCoords));
@@ -111,7 +108,7 @@ void main() {
 	// calculate prerequisites
 	vec3 normal = normalize(Normal);
 	vec3 viewDir = normalize(viewPos - FragPos);
-	vec3 light = texture(material.texture_emission1, texCoords).xyz; // TODO: fix emission light
+	vec3 light = texture(material.texture_emission1, texCoords).xyz;
 
 	// calculate light
 	light += calculateDirectionalLight(dirLight, normal, viewDir);

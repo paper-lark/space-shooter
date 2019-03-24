@@ -1,14 +1,15 @@
+#include "Player.h"
 #include "Spaceship.h"
 #include <spdlog/spdlog.h>
 
-Model *Spaceship::spaceshipModel = nullptr;
+Model *Player::spaceshipModel = nullptr;
 
-void Spaceship::Init() {
+void Player::Init() {
   SPDLOG_INFO("Loading model...");
   spaceshipModel = new Model("assets/ARC-170/Arc170.obj");
 }
 
-void Spaceship::Release() {
+void Player::Release() {
   if (spaceshipModel != nullptr) {
     delete spaceshipModel;
     spaceshipModel = nullptr;

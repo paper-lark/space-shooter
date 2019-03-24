@@ -11,9 +11,6 @@ class Object {
   float scale;
   float yaw, pitch, roll;
 
-  // Get model matrix for the object
-  glm::mat4 getObjectModelMatrix() const;
-
 public:
   // Constructor
   Object(const Model *model, unsigned health, glm::vec3 position, float scale = 1, float yaw = 0, float pitch = 0,
@@ -21,6 +18,9 @@ public:
       : model(model), health(health), position(position), scale(scale), yaw(yaw), pitch(pitch), roll(roll) {
     SPDLOG_INFO("Created");
   }
+
+  // Get model matrix for the object
+  glm::mat4 getObjectModelMatrix() const;
 
   // Move object in the specified direction
   void Move(glm::vec3 vec);
@@ -36,8 +36,17 @@ public:
     }
   }
 
+  // Set object rotation
+  std::tuple<float, float, float> rotate(std::tuple<float, float, float> delta);
+
+  // Get object rotation
+  std::tuple<float, float, float> getRotation() const;
+
   // Get object direction
   glm::vec3 getDirection() const;
+
+  // Get object position
+  glm::vec3 getPosition() const;
 
   // Get a flag whether the object is still alive
   bool IsAlive() const;
