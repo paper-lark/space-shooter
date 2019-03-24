@@ -30,7 +30,7 @@ void Mesh::setupMesh() {
   SPDLOG_DEBUG("Created mesh with {} vertices ({})", vertices.size(), vao);
 }
 
-void Mesh::Draw(Shader shader) const {
+void Mesh::draw(Shader shader) const {
 
   // bind textures
   unsigned currentDiffuse = 1;

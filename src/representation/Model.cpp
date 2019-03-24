@@ -105,8 +105,8 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type,
   return textures;
 }
 
-void Model::Draw(Shader &shader) const {
+void Model::draw(Shader &shader) const {
   for (const Mesh &mesh : meshes) {
-    mesh.Draw(shader);
+    mesh.draw(shader);
   }
 }

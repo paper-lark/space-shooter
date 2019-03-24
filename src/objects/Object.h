@@ -2,6 +2,7 @@
 #define SPACESHOOTER_OBJECT_H
 
 #include "../representation/Model.h"
+#include "../utils/QuatHelpers.h"
 #include <spdlog/spdlog.h>
 
 class Object {
@@ -30,10 +31,10 @@ public:
 
   // Move object in the specified direction
   // TODO: use speed instead
-  void Move(glm::vec3 vec);
+  void move(glm::vec3 vec);
 
   // Apply damage to the object. Returns true if object is still alive and false otherwise.
-  bool ApplyDamage(unsigned damage) {
+  bool applyDamage(unsigned damage) {
     if (health > damage) {
       health -= damage;
       return false;
@@ -46,9 +47,6 @@ public:
   // Set object rotation
   glm::quat rotate(glm::quat rotation);
 
-  // Get object direction
-  glm::vec3 getDirection() const;
-
   // Get object position
   glm::vec3 getPosition() const;
 
@@ -56,14 +54,13 @@ public:
   glm::quat getOrientation() const;
 
   // Get a flag whether the object is still alive
-  bool IsAlive() const;
+  bool isAlive() const;
 
   // Draw object
-  void Draw(Shader &shader) const;
+  void draw(Shader &shader) const;
 
   // Update object. Should be called on each frame
-  void Update(float deltaTime);
-
+  void update(float deltaTime);
 
   // Destructor
   ~Object() {

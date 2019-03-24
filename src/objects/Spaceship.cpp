@@ -3,12 +3,12 @@
 
 Model *Spaceship::spaceshipModel = nullptr;
 
-void Spaceship::Init() {
+void Spaceship::init() {
   SPDLOG_INFO("Loading model...");
   spaceshipModel = new Model("assets/ARC-170/Arc170.obj");
 }
 
-void Spaceship::Release() {
+void Spaceship::release() {
   if (spaceshipModel != nullptr) {
     delete spaceshipModel;
     spaceshipModel = nullptr;

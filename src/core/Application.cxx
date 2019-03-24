@@ -22,10 +22,10 @@ void Application::processKeyboardInput() {
   // Player movement
   if (player != nullptr) {
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-      player->Move(player->getDirection() * getDeltaTime());
+      player->move(QuatHelpers::getForward(player->getOrientation()) * getDeltaTime());
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-      player->Move(-player->getDirection() * getDeltaTime());
+      player->move(-QuatHelpers::getForward(player->getOrientation()) * getDeltaTime());
     }
   }
 }
@@ -59,7 +59,8 @@ void Application::update() {
 
   // update camera position and orientation
   if (player != nullptr) {
-    camera.updatePosition(player->getPosition() - player->getDirection() * 20.f);
+    auto orientation = player->getOrientation();
+    camera.updatePosition(player->getPosition() - 15.f * QuatHelpers::getForward(orientation) + QuatHelpers::getUp(orientation) * 3.f);
     camera.setOrientation(player->getOrientation());
   }
 }

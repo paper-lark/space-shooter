@@ -16,7 +16,7 @@ class Skybox {
 public:
   explicit Skybox(const std::vector<std::string> &faces, const Shader shader);
 
-  void Draw(const Camera &camera);
+  void draw(const Camera &camera);
 };
 
 #endif // SPACESHOOTER_SKYBOX_H

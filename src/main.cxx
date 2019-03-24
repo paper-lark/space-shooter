@@ -38,7 +38,7 @@ void initializeGLFW() {
 // Initialize OpenGL
 int initializeGL() {
   // load OpenGL with GLAD
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+  if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
     return -1;
   }
 
@@ -125,7 +125,7 @@ void startGameLoop(GLFWwindow *window, Application &app) {
     objShader.setVec3("dirLight.specular", lightSpecs.specular);
 
     objShader.setVec3("flashlight.position", app.camera.getPos());
-    objShader.setVec3("flashlight.direction", app.camera.getDirection());
+    objShader.setVec3("flashlight.direction", QuatHelpers::getForward(app.camera.getOrientation()));
     objShader.setFloat("flashlight.innerCutOff", glm::cos(glm::radians(12.5f)));
     objShader.setFloat("flashlight.outerCutOff", glm::cos(glm::radians(17.5f)));
     objShader.setVec3("flashlight.diffuse", lightSpecs.diffuse);
@@ -147,10 +147,10 @@ void startGameLoop(GLFWwindow *window, Application &app) {
     }
 
     for (Spaceship &ship : spaceships) {
-      ship.Draw(objShader);
-      ship.Update(app.getDeltaTime());
+      ship.draw(objShader);
+      ship.update(app.getDeltaTime());
     }
-    player.Draw(objShader);
+    player.draw(objShader);
 
     // draw light sources
     lightShader.use();
@@ -158,11 +158,11 @@ void startGameLoop(GLFWwindow *window, Application &app) {
     lightShader.setMatrix("projection", app.camera.getProjectionMatrix());
     for (int i = 0; i < length(lightPositions); i++) {
       lightShader.setMatrix("model", getLightModelMatrix(lightPositions[i]));
-      starModel.Draw(lightShader);
+      starModel.draw(lightShader);
     }
 
     // draw skybox
-    skybox.Draw(app.camera);
+    skybox.draw(app.camera);
 
     // update color buffers
     glfwSwapBuffers(window); // swap front and back color buffers
@@ -170,7 +170,7 @@ void startGameLoop(GLFWwindow *window, Application &app) {
 
     // remove all dead objects
     spaceships.erase(
-        std::remove_if(spaceships.begin(), spaceships.end(), [](const Spaceship &s) { return !s.IsAlive(); }),
+        std::remove_if(spaceships.begin(), spaceships.end(), [](const Spaceship &s) { return !s.isAlive(); }),
         spaceships.end());
   }
 
@@ -179,7 +179,7 @@ void startGameLoop(GLFWwindow *window, Application &app) {
 }
 
 // Entry point
-int main(int argc, char **argv) {
+int main(int, char **) {
   // Initialize logger
   spdlog::set_pattern("%T – %l [%s] %v");
   SPDLOG_INFO("Initializing application...");
@@ -214,8 +214,8 @@ int main(int argc, char **argv) {
 
   // Load all models
   SPDLOG_INFO("Loading models...");
-  Spaceship::Init();
-  Player::Init();
+  Spaceship::init();
+  Player::init();
 
   // Start game loop
   SPDLOG_INFO("Starting game loop...");
@@ -223,8 +223,8 @@ int main(int argc, char **argv) {
 
   // Terminate GLFW
   SPDLOG_INFO("Terminating...");
-  Spaceship::Release();
-  Player::Release();
+  Spaceship::release();
+  Player::release();
   glfwTerminate();
   return 0;
 }

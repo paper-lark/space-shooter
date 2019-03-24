@@ -34,7 +34,7 @@ public:
     setupMesh();
   };
 
-  void Draw(Shader shader) const;
+  void draw(Shader shader) const;
 
   // TODO: fix
   //    ~Mesh() {

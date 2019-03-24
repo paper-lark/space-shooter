@@ -26,11 +26,8 @@ public:
   // Get projection matrix (view -> clip)
   glm::mat4 getProjectionMatrix() const;
 
-  // Get camera direction
-  glm::vec3 getDirection() const;
-
-  // Get camera upward direction
-  glm::vec3 getUp() const;
+  // Get orientation
+  glm::quat getOrientation() const;
 
   // Get camera position
   glm::vec3 getPos() const {

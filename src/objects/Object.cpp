@@ -8,31 +8,24 @@ glm::mat4 Object::getObjectModelMatrix() const {
   return translate * rotate;
 }
 
-void Object::Move(glm::vec3 vec) {
+void Object::move(glm::vec3 vec) {
   SPDLOG_INFO("Moving object: {} {} {}", vec.x, vec.y, vec.z);
   position += vec * speed;
 }
 
-glm::vec3 Object::getDirection() const {
-  auto dir = glm::normalize(glm::vec3(2 * (orientation.x * orientation.z + orientation.w * orientation.y),
-                                  2 * (orientation.y * orientation.z - orientation.w * orientation.x),
-                                  1 - 2 * (orientation.x * orientation.x + orientation.y * orientation.y)));
-  return dir;
-}
-
-bool Object::IsAlive() const {
+bool Object::isAlive() const {
   return health > 0;
 }
 
-void Object::Draw(Shader &shader) const {
+void Object::draw(Shader &shader) const {
   shader.setMatrix("model", this->getObjectModelMatrix());
   shader.setUint("health", health);
-  model->Draw(shader);
+  model->draw(shader);
 }
 
-void Object::Update(float deltaTime) {
+void Object::update(float deltaTime) {
   this->rotate(glm::angleAxis(glm::radians(10.f * deltaTime), glm::vec3(0, 0, 1)));
-  this->Move(this->getDirection() * deltaTime);
+  this->move(QuatHelpers::getForward(this->getOrientation()) * deltaTime);
 }
 
 glm::vec3 Object::getPosition() const {

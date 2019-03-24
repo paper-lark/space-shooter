@@ -44,7 +44,7 @@ Skybox::Skybox(const std::vector<std::string> &faces, const Shader shader)
   glEnableVertexAttribArray(0);
 }
 
-void Skybox::Draw(const Camera &camera) {
+void Skybox::draw(const Camera &camera) {
   shader.use();
   glm::mat4 view = glm::mat4(glm::mat3(camera.getViewMatrix()));
   shader.setMatrix("view", view);

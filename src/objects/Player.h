@@ -8,9 +8,9 @@ class Player : public Object {
   static Model *spaceshipModel;
 
 public:
-  static void Init();
+  static void init();
 
-  static void Release();
+  static void release();
 
   Player(unsigned health, const glm::vec3 position) : Object(spaceshipModel, health, position, 0.005f) {}
 };

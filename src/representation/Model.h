@@ -25,7 +25,7 @@ public:
     loadModel(path);
   }
 
-  void Draw(Shader &shader) const;
+  void draw(Shader &shader) const;
 };
 
 #endif // SPACESHOOTER_MODEL_H
