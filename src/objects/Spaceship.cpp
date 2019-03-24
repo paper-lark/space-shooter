@@ -15,3 +15,8 @@ void Spaceship::release() {
     SPDLOG_INFO("Model released");
   } // TODO: be careful with releasing when models are still drawing
 }
+
+void Spaceship::update(float deltaTime) {
+  this->updateSpeed(0.1f * deltaTime);
+  Object::update(deltaTime);
+}

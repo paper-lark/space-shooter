@@ -151,6 +151,7 @@ void startGameLoop(GLFWwindow *window, Application &app) {
       ship.update(app.getDeltaTime());
     }
     player.draw(objShader);
+    player.update(app.getDeltaTime());
 
     // draw light sources
     lightShader.use();

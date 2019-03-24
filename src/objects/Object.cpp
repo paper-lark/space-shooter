@@ -8,9 +8,8 @@ glm::mat4 Object::getObjectModelMatrix() const {
   return translate * rotate;
 }
 
-void Object::move(glm::vec3 vec) {
-  SPDLOG_INFO("Moving object: {} {} {}", vec.x, vec.y, vec.z);
-  position += vec * speed;
+void Object::updateSpeed(float deltaSpeed) {
+  speed += deltaSpeed;
 }
 
 bool Object::isAlive() const {
@@ -24,8 +23,11 @@ void Object::draw(Shader &shader) const {
 }
 
 void Object::update(float deltaTime) {
-  this->rotate(glm::angleAxis(glm::radians(10.f * deltaTime), glm::vec3(0, 0, 1)));
-  this->move(QuatHelpers::getForward(this->getOrientation()) * deltaTime);
+  // make sure speed is in the specified range
+  speed = glm::clamp(speed, std::get<0>(speedLimit), std::get<1>(speedLimit));
+
+  // move object according to its speed
+  position += speed * deltaTime * QuatHelpers::getForward(orientation);
 }
 
 glm::vec3 Object::getPosition() const {

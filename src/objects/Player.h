@@ -12,7 +12,7 @@ public:
 
   static void release();
 
-  Player(unsigned health, const glm::vec3 position) : Object(spaceshipModel, health, position, 0.005f) {}
+  Player(unsigned health, const glm::vec3 position) : Object(spaceshipModel, health, position, 0.005f, std::make_tuple(0.1f, 5.f)) {}
 };
 
 #endif // SPACESHOOTER_PLAYER_H

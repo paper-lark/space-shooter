@@ -22,10 +22,10 @@ void Application::processKeyboardInput() {
   // Player movement
   if (player != nullptr) {
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-      player->move(QuatHelpers::getForward(player->getOrientation()) * getDeltaTime());
+      player->updateSpeed(0.2f * getDeltaTime());
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-      player->move(-QuatHelpers::getForward(player->getOrientation()) * getDeltaTime());
+      player->updateSpeed(-0.175f * getDeltaTime());
     }
   }
 }

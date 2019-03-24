@@ -11,27 +11,24 @@ class Object {
   glm::vec3 position;
   float scale;
   glm::quat orientation;
-  float speed = 5.05f;
+  float speed = 0.f;
+  std::tuple<float, float> speedLimit;
 
 public:
   // Constructor
-  Object(const Model *model, unsigned health, glm::vec3 position, float scale = 1, float yaw = 0, float pitch = 0,
-         float roll = 0)
-      : model(model), health(health), position(position), scale(scale) {
+  Object(const Model *model, unsigned health, glm::vec3 position, float scale, std::tuple<float, float> speedLimit,
+         float yaw = 0, float pitch = 0, float roll = 0)
+      : model(model), health(health), position(position), scale(scale), speedLimit(std::move(speedLimit)) {
 
     glm::quat qPitch = glm::angleAxis(glm::radians(pitch), glm::vec3(1, 0, 0));
     glm::quat qYaw = glm::angleAxis(glm::radians(yaw), glm::vec3(0, 1, 0));
-    glm::quat qRoll = glm::angleAxis(glm::radians(roll),glm::vec3(0,0,1));
+    glm::quat qRoll = glm::angleAxis(glm::radians(roll), glm::vec3(0, 0, 1));
     orientation = glm::normalize(qPitch * qYaw * qRoll);
     SPDLOG_INFO("Created");
   }
 
   // Get model matrix for the object
   glm::mat4 getObjectModelMatrix() const;
-
-  // Move object in the specified direction
-  // TODO: use speed instead
-  void move(glm::vec3 vec);
 
   // Apply damage to the object. Returns true if object is still alive and false otherwise.
   bool applyDamage(unsigned damage) {
@@ -43,6 +40,10 @@ public:
       return true;
     }
   }
+
+  // Update speed by a specified delta
+  // TODO: incapsulate acceleration
+  void updateSpeed(float deltaSpeed);
 
   // Set object rotation
   glm::quat rotate(glm::quat rotation);
@@ -60,10 +61,10 @@ public:
   void draw(Shader &shader) const;
 
   // Update object. Should be called on each frame
-  void update(float deltaTime);
+  virtual void update(float deltaTime);
 
   // Destructor
-  ~Object() {
+  virtual ~Object() {
     SPDLOG_INFO("Destructed");
   }
 };
