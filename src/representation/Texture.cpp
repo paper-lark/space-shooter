@@ -28,7 +28,7 @@ void Texture::bindImage(GLenum target, const std::string &path) {
     stbi_image_free(data);
 }
 
-Texture::Texture(const std::string &name, const std::vector<std::string> &paths) : mapType(name), path(paths[0]), textureType(GL_TEXTURE_CUBE_MAP) {
+Texture::Texture(TextureMapType type, const std::vector<std::string> &paths) : mapType(type), path(paths[0]), textureType(GL_TEXTURE_CUBE_MAP) {
     // create texture object
     GLuint texture;
     glGenTextures(1, &texture);
@@ -50,7 +50,7 @@ Texture::Texture(const std::string &name, const std::vector<std::string> &paths)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 }
 
-Texture::Texture(const std::string &name, const std::string &path) : mapType(name), path(path), textureType(GL_TEXTURE_2D) {
+Texture::Texture(TextureMapType type, const std::string &path) : mapType(type), path(path), textureType(GL_TEXTURE_2D) {
     // create texture object
     GLuint texture;
     glGenTextures(1, &texture);

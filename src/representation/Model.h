@@ -18,7 +18,7 @@ class Model {
     void loadModel(const string &path);
     void processNode(const aiNode *node, const aiScene *scene);
     Mesh processMesh(const aiMesh *mesh, const aiScene *scene);
-    vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, const string &typeName);
+    vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, TextureMapType typeName);
 
 public:
     Model(const string &path) {

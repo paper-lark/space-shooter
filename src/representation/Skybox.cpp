@@ -55,7 +55,7 @@ static unsigned indices[] = {
         22, 21, 23
 };
 
-Skybox::Skybox(const std::vector<std::string> &faces, const Shader shader) : shader(shader), texture("texture_diffuse", faces) {
+Skybox::Skybox(const std::vector<std::string> &faces, const Shader shader) : shader(shader), texture(TextureMapType::Diffuse, faces) {
     glGenVertexArrays(1, &mesh);
     glBindVertexArray(mesh);
 

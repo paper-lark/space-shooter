@@ -38,21 +38,26 @@ void Mesh::Draw(Shader shader) const {
     unsigned currentEmission = 1;
     unsigned current = 0;
     for (const Texture &texture : textures) {
-        std::string number;
-        const std::string &name = texture.getName();
+        std::string name;
+        TextureMapType type = texture.getName();
         texture.bind(GL_TEXTURE0 + current);
 
-        if (name == "texture_diffuse") {
-            number = std::to_string(currentDiffuse++);
-        } else if (name == "texture_specular") {
-            number = std::to_string(currentSpecular++);
-        } else if (name == "texture_emission") {
-            number = std::to_string(currentEmission++);
-        } else {
-            throw std::runtime_error("Unknown texture type: " + name);
+
+        switch (type) {
+            case TextureMapType::Diffuse:
+                name = "texture_diffuse" + std::to_string(currentDiffuse++);
+                break;
+            case TextureMapType::Emission:
+                name = "texture_emission" + std::to_string(currentEmission++);
+                break;
+            case TextureMapType::Specular:
+                name = "texture_specular" + std::to_string(currentSpecular++);
+                break;
+            default:
+                throw std::runtime_error("Unknown texture type");
         }
 
-        std::string uniformLabel = std::string("material.").append(name).append(number);
+        std::string uniformLabel = "material." + name;
         shader.setFloat(uniformLabel, current);
         current++;
     }

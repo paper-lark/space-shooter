@@ -75,15 +75,15 @@ Mesh Model::processMesh(const aiMesh *mesh, const aiScene *scene) {
     // process mesh material
     if (mesh->mMaterialIndex >= 0) {
         aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-        vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
-        vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+        vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, TextureMapType::Diffuse);
+        vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, TextureMapType::Specular);
         textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     }
     return Mesh(vertices, indices, textures);
 }
 
-vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, const string &typeName) {
+vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, TextureMapType typeName) {
     vector<Texture> textures;
     unsigned textureCount = mat->GetTextureCount(type);
 
