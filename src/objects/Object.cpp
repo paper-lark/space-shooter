@@ -1,27 +1,23 @@
 #include "Object.h"
+#include <spdlog/spdlog.h>
 
 glm::mat4 Object::getObjectModelMatrix() const {
-  glm::mat4 matrix = glm::mat4(1.f);
-  matrix = glm::translate(matrix, position);
-  matrix = glm::rotate(matrix, glm::radians(pitch), glm::vec3(1.f, 0.f, 0.f));
-  matrix = glm::rotate(matrix, glm::radians(yaw + 90),
-                       glm::vec3(0.f, 1.f, 0.f)); // yaw is modified due to the model position
-  matrix = glm::rotate(matrix, glm::radians(roll), glm::vec3(0.f, 0.f, 1.f));
-  matrix = glm::scale(matrix, glm::vec3(scale));
-  return matrix;
+  glm::mat4 rotate = glm::mat4_cast(orientation);
+  glm::mat4 translate = glm::translate(glm::mat4(1.f), position);
+  translate = glm::scale(translate, glm::vec3(scale));
+  return translate * rotate;
 }
 
 void Object::Move(glm::vec3 vec) {
-  position += vec;
+  SPDLOG_INFO("Moving object: {} {} {}", vec.x, vec.y, vec.z);
+  position += vec * speed;
 }
 
 glm::vec3 Object::getDirection() const {
-  return glm::vec3(cos(glm::radians(pitch)) * cos(glm::radians(yaw)), sin(glm::radians(pitch)),
-                   cos(glm::radians(pitch)) * sin(glm::radians(yaw)));
-}
-
-std::tuple<float, float, float> Object::getRotation() const {
-  return std::make_tuple(pitch, yaw, roll);
+  auto dir = glm::normalize(glm::vec3(2 * (orientation.x * orientation.z + orientation.w * orientation.y),
+                                  2 * (orientation.y * orientation.z - orientation.w * orientation.x),
+                                  1 - 2 * (orientation.x * orientation.x + orientation.y * orientation.y)));
+  return dir;
 }
 
 bool Object::IsAlive() const {
@@ -35,7 +31,7 @@ void Object::Draw(Shader &shader) const {
 }
 
 void Object::Update(float deltaTime) {
-  roll += deltaTime * 10;
+  this->rotate(glm::angleAxis(glm::radians(10.f * deltaTime), glm::vec3(0, 0, 1)));
   this->Move(this->getDirection() * deltaTime);
 }
 
@@ -43,10 +39,11 @@ glm::vec3 Object::getPosition() const {
   return position;
 }
 
-std::tuple<float, float, float> Object::rotate(std::tuple<float, float, float> delta) {
-  pitch += std::get<0>(delta);
-  yaw += std::get<1>(delta);
-  roll += std::get<2>(delta);
-  SPDLOG_INFO("Updated rotation: {} {} {}", pitch, yaw, roll);
-  return std::make_tuple(pitch, yaw, roll);
+glm::quat Object::getOrientation() const {
+  return orientation;
+}
+
+glm::quat Object::rotate(glm::quat rotation) {
+  orientation = glm::normalize(orientation * rotation);
+  return orientation;
 }

@@ -19,18 +19,14 @@ void Application::processKeyboardInput() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
 
-  // Camera movement
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    camera.move(camera.getDirection() * getDeltaTime());
-  }
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    camera.move(-camera.getDirection() * getDeltaTime());
-  }
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    camera.move(-glm::normalize(glm::cross(camera.getDirection(), camera.getUp())) * getDeltaTime());
-  }
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    camera.move(glm::normalize(glm::cross(camera.getDirection(), camera.getUp())) * getDeltaTime());
+  // Player movement
+  if (player != nullptr) {
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+      player->Move(player->getDirection() * getDeltaTime());
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+      player->Move(-player->getDirection() * getDeltaTime());
+    }
   }
 }
 
@@ -45,8 +41,10 @@ void Application::processMouseInput(GLFWwindow *, double posX, double posY) {
     lastX = posX;
     lastY = posY;
 
-    camera.updateRotation(-offsetY, offsetX);
-    // TODO: implement rotation
+    glm::quat qPitch = glm::angleAxis(glm::radians(-offsetY), glm::vec3(1, 0, 0));
+    glm::quat qYaw = glm::angleAxis(glm::radians(offsetX), glm::vec3(0, 1, 0));
+
+    player->rotate(qPitch * qYaw);
   }
 }
 
@@ -58,6 +56,12 @@ void Application::update() {
 
   // process input
   processKeyboardInput();
+
+  // update camera position and orientation
+  if (player != nullptr) {
+    camera.updatePosition(player->getPosition() - player->getDirection() * 20.f);
+    camera.setOrientation(player->getOrientation());
+  }
 }
 
 // Get time passed from previous render

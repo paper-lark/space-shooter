@@ -109,9 +109,6 @@ void startGameLoop(GLFWwindow *window, Application &app) {
     // update application
     app.update();
 
-    // update camera position
-    app.camera.updatePosition(player.getPosition() - player.getDirection() * 10.f);
-
     // clear screen
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(unsigned(GL_COLOR_BUFFER_BIT) | unsigned(GL_DEPTH_BUFFER_BIT));
