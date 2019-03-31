@@ -1,5 +1,6 @@
 #include "Object.h"
 #include <spdlog/spdlog.h>
+#include "../utils/Box.h"
 
 glm::mat4 Object::getObjectModelMatrix() const {
   glm::mat4 rotate = glm::mat4_cast(orientation);
@@ -17,6 +18,7 @@ bool Object::isAlive() const {
 }
 
 void Object::draw(Shader &shader) const {
+  shader.use();
   shader.setMatrix("model", this->getObjectModelMatrix());
   shader.setUint("health", health);
   model->draw(shader);

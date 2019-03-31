@@ -13,7 +13,7 @@ public:
   static void release();
 
   Spaceship(unsigned health, const glm::vec3 position)
-      : Object(spaceshipModel, health, position, 0.005f, std::make_tuple(0.1f, 3.f)) {}
+      : Object(spaceshipModel, health, position, glm::vec3(6.f, 1.5f, 4.f), 0.005f, std::make_tuple(0.1f, 3.f)) {}
 
   // Update object. Should be called on each frame
   void update(float deltaTime);

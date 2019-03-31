@@ -99,6 +99,7 @@ void HUD::Draw(Shader &shader, glm::ivec2 windowSize, unsigned health, unsigned 
   shader.setVec3("textColor", glm::vec3(0.9f, 0.9f, 0.9f));
   RenderText(shader, "Health: " + std::to_string(health), glm::vec2(10.f, 10.f), 1.0f);
   RenderText(shader, "Score:  " + std::to_string(score), glm::vec2(10.f, 34.f), 1.0f);
+  RenderText(shader, "+", glm::vec2(windowSize.x * 0.5f, windowSize.y * 0.5f - 2.0f), 1.0f);
 }
 
 HUD::~HUD() {

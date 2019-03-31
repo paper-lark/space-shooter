@@ -6,12 +6,15 @@
 #include "core/Callback.h"
 #include "core/Camera.h"
 #include "core/HUD.h"
+#include "core/Scene.h"
 #include "objects/Player.h"
 #include "objects/Spaceship.h"
+#include "objects/Star.h"
 #include "representation/Model.h"
 #include "representation/Shader.h"
 #include "representation/Skybox.h"
 #include "representation/Texture.h"
+#include "utils/Box.h"
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -65,26 +68,6 @@ int initializeGL() {
   return 0;
 }
 
-struct Light {
-  glm::vec3 ambient;
-  glm::vec3 diffuse;
-  glm::vec3 specular;
-
-  float constant;
-  float linear;
-  float quadratic;
-};
-
-Light getLight() {
-  return Light{glm::vec3(0.2f, 0.2f, 0.2f),
-               glm::vec3(0.5f, 0.5f, 0.5f),
-               glm::vec3(1.0f, 1.0f, 1.0f),
-
-               1.0,
-               0.09,
-               0.032};
-}
-
 // Get light source model matrix (local -> world)
 glm::mat4 getLightModelMatrix(const glm::vec3 position) {
   glm::mat4 matrix = glm::mat4(1.f);
@@ -97,27 +80,8 @@ glm::mat4 getLightModelMatrix(const glm::vec3 position) {
 void startGameLoop(GLFWwindow *window, Application &app) {
   // create prerequisites
   HUD hud("assets/Fonts/ShareTechMono.ttf");
-  glm::vec3 lightPositions[] = {glm::vec3(105.7f, 13.75f, 19.0f), glm::vec3(123.3f, -50.f, -55.0f),
-                                glm::vec3(-35.0f, 76.0f, 83.0f), glm::vec3(-58.25f, 33.75f, -143.0f)};
-
-  std::vector<Spaceship> spaceships = {
-      {100, glm::vec3(10.f, 6.f, -15.f)},  {100, glm::vec3(23.f, 11.f, 3.f)},   {1000, glm::vec3(12.f, 5.f, -1.f)},
-      {100, glm::vec3(1.f, -12.f, -13.f)}, {10000, glm::vec3(15.f, 2.f, 22.f)}, {10000, glm::vec3(-5.f, -12.f, -32.f)},
-  };
-  Player player{1000, glm::vec3(0.f, 0.f, 0.f)};
-  app.bindPlayer(&player);
-
-  std::vector<std::string> textures_faces = {"assets/Skybox/lightblue/right.png", "assets/Skybox/lightblue/left.png",
-                                             "assets/Skybox/lightblue/top.png",   "assets/Skybox/lightblue/bot.png",
-                                             "assets/Skybox/lightblue/front.png", "assets/Skybox/lightblue/back.png"};
-  Skybox skybox{textures_faces, Shader("skybox/vertex.glsl", "skybox/fragment.glsl")};
-  Model starModel{"assets/Star/Mercury 1K.obj"}; // TODO: move to object
-
-  // create textures and shaders
-  Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
-  Shader lightShader = Shader("light/vertex.glsl", "light/fragment.glsl");
   Shader hudShader = Shader("hud/vertex.glsl", "hud/fragment.glsl");
-  Light lightSpecs = getLight();
+  Scene scene{};
 
   while (!glfwWindowShouldClose(window)) {
     // update application
@@ -127,69 +91,17 @@ void startGameLoop(GLFWwindow *window, Application &app) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(unsigned(GL_COLOR_BUFFER_BIT) | unsigned(GL_DEPTH_BUFFER_BIT));
 
-    // draw object
-    objShader.use();
-    objShader.setMatrix("view", app.camera.getViewMatrix());
-    objShader.setMatrix("projection", app.camera.getProjectionMatrix());
-    objShader.setVec3("viewPos", app.camera.getPos());
+    // draw scene and HUD
+    scene.draw(app.camera);
+    hud.Draw(hudShader, app.getWindowSize(), scene.getPlayer()->getHealth(), app.getScore());
 
-    objShader.setVec3("dirLight.direction", glm::vec3(0.f, 10.f, 5.f));
-    objShader.setVec3("dirLight.diffuse", lightSpecs.diffuse);
-    objShader.setVec3("dirLight.ambient", lightSpecs.ambient);
-    objShader.setVec3("dirLight.specular", lightSpecs.specular);
-
-    objShader.setVec3("flashlight.position", app.camera.getPos());
-    objShader.setVec3("flashlight.direction", QuatHelpers::getForward(app.camera.getOrientation()));
-    objShader.setFloat("flashlight.innerCutOff", glm::cos(glm::radians(12.5f)));
-    objShader.setFloat("flashlight.outerCutOff", glm::cos(glm::radians(17.5f)));
-    objShader.setVec3("flashlight.diffuse", lightSpecs.diffuse);
-    objShader.setVec3("flashlight.ambient", lightSpecs.ambient);
-    objShader.setVec3("flashlight.specular", lightSpecs.specular);
-    objShader.setFloat("flashlight.constant", lightSpecs.constant);
-    objShader.setFloat("flashlight.linear", lightSpecs.linear);
-    objShader.setFloat("flashlight.quadratic", lightSpecs.quadratic);
-
-    for (int i = 0; i < length(lightPositions); i++) {
-      std::string prefix = "pointLights[" + std::to_string(i) + "]";
-      objShader.setVec3(prefix + ".position", lightPositions[i]);
-      objShader.setVec3(prefix + ".diffuse", lightSpecs.diffuse);
-      objShader.setVec3(prefix + ".ambient", lightSpecs.ambient);
-      objShader.setVec3(prefix + ".specular", lightSpecs.specular);
-      objShader.setFloat(prefix + ".constant", lightSpecs.constant);
-      objShader.setFloat(prefix + ".linear", lightSpecs.linear);
-      objShader.setFloat(prefix + ".quadratic", lightSpecs.quadratic);
-    }
-
-    for (Spaceship &ship : spaceships) {
-      ship.draw(objShader);
-      ship.update(app.getDeltaTime());
-    }
-    player.draw(objShader);
-    player.update(app.getDeltaTime());
-
-    // draw light sources
-    lightShader.use();
-    lightShader.setMatrix("view", app.camera.getViewMatrix());
-    lightShader.setMatrix("projection", app.camera.getProjectionMatrix());
-    for (int i = 0; i < length(lightPositions); i++) {
-      lightShader.setMatrix("model", getLightModelMatrix(lightPositions[i]));
-      starModel.draw(lightShader);
-    }
-
-    // draw skybox
-    skybox.draw(app.camera);
-
-    // draw HUD
-    hud.Draw(hudShader, app.getWindowSize(), player.getHealth(), app.getScore());
+    // update scene
+    scene.update(app.getDeltaTime());
+    // TODO: check player health
 
     // update color buffers
     glfwSwapBuffers(window); // swap front and back color buffers
     glfwPollEvents();        // process all events
-
-    // remove all dead objects
-    spaceships.erase(
-        std::remove_if(spaceships.begin(), spaceships.end(), [](const Spaceship &s) { return !s.isAlive(); }),
-        spaceships.end());
   }
 
   // unbind player
@@ -233,6 +145,7 @@ int main(int, char **) {
   SPDLOG_INFO("Loading models...");
   Spaceship::init();
   Player::init();
+  Star::init();
 
   // Start game loop
   SPDLOG_INFO("Starting game loop...");
@@ -242,6 +155,7 @@ int main(int, char **) {
   SPDLOG_INFO("Terminating...");
   Spaceship::release();
   Player::release();
+  Star::release();
   glfwTerminate();
   return 0;
 }

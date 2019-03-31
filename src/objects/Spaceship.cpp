@@ -17,6 +17,6 @@ void Spaceship::release() {
 }
 
 void Spaceship::update(float deltaTime) {
-  this->updateSpeed(0.1f * deltaTime);
+  this->updateSpeed(0.5f * deltaTime);
   Object::update(deltaTime);
 }
