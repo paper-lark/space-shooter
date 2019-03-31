@@ -4,6 +4,7 @@
 #define GL_SILENCE_DEPRECATION
 #include "../objects/Player.h"
 #include "Camera.h"
+#include "CameraPosition.h"
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
@@ -14,6 +15,7 @@ private:
   double deltaTime = 0.0;
   Player *player = nullptr;
   const float sensitivity = 0.05f; // mouse sensitivity
+  CameraPosition cameraPosition = CameraPosition::ThirdPerson;
   static Application &instance;
 
 public:

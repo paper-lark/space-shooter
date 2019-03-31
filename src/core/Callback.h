@@ -9,7 +9,7 @@ class Callback {
 
 public:
   // Current window size
-  static GLint windowSize[2];
+  static GLint windowSize[2]; // FIXME: remove
 
   // Window resize callback
   static void windowResize(GLFWwindow *, GLint width, GLint height);

@@ -7,6 +7,7 @@ The project is currently under development.
 - [PkgConfig](https://cmake.org/cmake/help/v3.0/module/FindPkgConfig.html)
 - [GLFW](https://www.glfw.org)
 - [Assimp](http://www.assimp.org)
+- [Freetype](https://www.freetype.org/download.html) ([link](http://ubuntuhandbook.org/index.php/2017/06/install-freetype-2-8-in-ubuntu-16-04-17-04/))
 - [GLM](https://glm.g-truc.net/0.9.9/index.html) (provided)
 - [STB](https://github.com/nothings/stb) (provided)
 - [SPDLog](https://github.com/gabime/spdlog) (provided)

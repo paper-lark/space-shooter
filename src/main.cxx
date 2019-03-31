@@ -5,6 +5,7 @@
 #include "core/Application.h"
 #include "core/Callback.h"
 #include "core/Camera.h"
+#include "core/HUD.h"
 #include "objects/Player.h"
 #include "objects/Spaceship.h"
 #include "representation/Model.h"
@@ -50,6 +51,11 @@ int initializeGL() {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
 
+  // enable blending
+  // TODO: read about it
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
   return 0;
 }
 
@@ -84,6 +90,7 @@ glm::mat4 getLightModelMatrix(const glm::vec3 position) {
 // Start game loop that ends when GLFW is signaled to close
 void startGameLoop(GLFWwindow *window, Application &app) {
   // create prerequisites
+  HUD hud("assets/Fonts/ShareTechMono.ttf");
   glm::vec3 lightPositions[] = {glm::vec3(105.7f, 13.75f, 19.0f), glm::vec3(123.3f, -50.f, -55.0f),
                                 glm::vec3(-35.0f, 76.0f, 83.0f), glm::vec3(-58.25f, 33.75f, -143.0f)};
 
@@ -103,6 +110,7 @@ void startGameLoop(GLFWwindow *window, Application &app) {
   // create textures and shaders
   Shader objShader = Shader("object/vertex.glsl", "object/fragment.glsl");
   Shader lightShader = Shader("light/vertex.glsl", "light/fragment.glsl");
+  Shader hudShader = Shader("hud/vertex.glsl", "hud/fragment.glsl");
   Light lightSpecs = getLight();
 
   while (!glfwWindowShouldClose(window)) {
@@ -164,6 +172,9 @@ void startGameLoop(GLFWwindow *window, Application &app) {
 
     // draw skybox
     skybox.draw(app.camera);
+
+    // draw HUD
+    hud.Draw(hudShader);
 
     // update color buffers
     glfwSwapBuffers(window); // swap front and back color buffers

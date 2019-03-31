@@ -2,6 +2,7 @@
 #include <fstream>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <spdlog/spdlog.h>
 
 // Load shader specified by its source file and type
 GLuint loadShader(GLenum type, const std::string &filename) {

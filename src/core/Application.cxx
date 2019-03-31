@@ -19,6 +19,14 @@ void Application::processKeyboardInput() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   }
 
+  // Camera mode
+  if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS) {
+    cameraPosition = CameraPosition::ThirdPerson;
+  }
+  if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS) {
+    cameraPosition = CameraPosition::FirstPerson;
+  }
+
   // Player movement
   if (player != nullptr) {
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
@@ -60,7 +68,10 @@ void Application::update() {
   // update camera position and orientation
   if (player != nullptr) {
     auto orientation = player->getOrientation();
-    camera.updatePosition(player->getPosition() - 15.f * QuatHelpers::getForward(orientation) + QuatHelpers::getUp(orientation) * 3.f);
+    glm::vec3 cameraOffset = cameraPosition == CameraPosition::FirstPerson ?
+        + 5.f * QuatHelpers::getForward(orientation) :
+        - 15.f * QuatHelpers::getForward(orientation) + QuatHelpers::getUp(orientation) * 3.f;
+    camera.updatePosition(player->getPosition() + cameraOffset);
     camera.setOrientation(player->getOrientation());
   }
 }
