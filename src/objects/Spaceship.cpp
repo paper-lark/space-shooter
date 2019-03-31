@@ -13,7 +13,7 @@ void Spaceship::release() {
     delete spaceshipModel;
     spaceshipModel = nullptr;
     SPDLOG_INFO("Model released");
-  } // TODO: be careful with releasing when models are still drawing
+  }
 }
 
 void Spaceship::update(float deltaTime) {

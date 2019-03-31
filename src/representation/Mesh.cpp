@@ -66,3 +66,10 @@ void Mesh::draw(Shader shader) const {
   glDrawElements(GL_TRIANGLES, GLsizei(indices.size()), GL_UNSIGNED_INT, nullptr);
   glBindVertexArray(0);
 }
+
+Mesh::~Mesh() {
+  glDeleteVertexArrays(1, &vao);
+  glDeleteBuffers(1, &vbo);
+  glDeleteBuffers(1, &ebo);
+  SPDLOG_INFO("Mesh destructed");
+}

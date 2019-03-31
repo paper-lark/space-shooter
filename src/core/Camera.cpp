@@ -5,11 +5,6 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 
-// Move camera
-void Camera::move(glm::vec3 direction) {
-  position += direction * speed;
-}
-
 // Set camera position
 void Camera::updatePosition(glm::vec3 pos) {
   position = pos;

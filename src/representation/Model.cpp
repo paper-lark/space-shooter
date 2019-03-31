@@ -26,10 +26,9 @@ void Model::loadModel(const string &path) {
 
 void Model::processNode(const aiNode *node, const aiScene *scene) {
   // process node mesh
-  // TODO: create relations between meshes
   for (unsigned i = 0; i < node->mNumMeshes; i++) {
     aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-    meshes.push_back(processMesh(mesh, scene));
+    meshes.emplace_back(processMesh(mesh, scene));
   }
 
   // repeat process for all its children

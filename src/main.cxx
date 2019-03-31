@@ -52,9 +52,11 @@ int initializeGL() {
   glDepthFunc(GL_LEQUAL);
 
   // enable blending
-  // TODO: read about it
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  // enable face culling
+  glEnable(GL_CULL_FACE);
 
   return 0;
 }

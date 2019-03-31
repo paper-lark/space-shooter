@@ -33,15 +33,19 @@ public:
       : vertices(vertices), indices(indices), textures(textures) {
     setupMesh();
   };
+  Mesh(const Mesh &) = delete;
+
+  Mesh(Mesh &&other)
+      : vao(other.vao), vbo(other.vbo), ebo(other.ebo), vertices(other.vertices), indices(other.indices),
+        textures(other.textures) {
+    other.ebo = 0;
+    other.vao = 0;
+    other.vbo = 0;
+  }
 
   void draw(Shader shader) const;
 
-  // TODO: fix
-  //    ~Mesh() {
-  //        glDeleteVertexArrays(1, &vao);
-  //        glDeleteBuffers(1, &vbo);
-  //        glDeleteBuffers(1, &ebo);
-  //    }
+  ~Mesh();
 };
 
 #endif // SPACESHOOTER_MESH_H

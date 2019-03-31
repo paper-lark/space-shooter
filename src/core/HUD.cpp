@@ -28,17 +28,8 @@ HUD::HUD(const std::string &path) {
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(
-        GL_TEXTURE_2D,
-        0,
-        GL_RED,
-        font->glyph->bitmap.width,
-        font->glyph->bitmap.rows,
-        0,
-        GL_RED,
-        GL_UNSIGNED_BYTE,
-        font->glyph->bitmap.buffer
-    );
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, font->glyph->bitmap.width, font->glyph->bitmap.rows, 0, GL_RED,
+                 GL_UNSIGNED_BYTE, font->glyph->bitmap.buffer);
     // set texture options
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -46,12 +37,9 @@ HUD::HUD(const std::string &path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // store character
-    Character character = {
-        texture,
-        glm::ivec2(font->glyph->bitmap.width, font->glyph->bitmap.rows),
-        glm::ivec2(font->glyph->bitmap_left, font->glyph->bitmap_top),
-        GLuint(font->glyph->advance.x)
-    };
+    Character character = {texture, glm::ivec2(font->glyph->bitmap.width, font->glyph->bitmap.rows),
+                           glm::ivec2(font->glyph->bitmap_left, font->glyph->bitmap_top),
+                           GLuint(font->glyph->advance.x)};
     characters.insert(std::make_pair(GLchar(ch), character));
   } // TODO: reuse `Texture` class
   SPDLOG_INFO("Current map size: {}", characters.size());
@@ -82,14 +70,8 @@ void HUD::RenderText(Shader &shader, const std::string &text, glm::vec2 position
     GLfloat h = ch.size.y * scale;
 
     // update VBO for each character
-    GLfloat vertices[6][4] = {
-        { xPos,     yPos + h,   0.0, 0.0 },
-        { xPos,     yPos,       0.0, 1.0 },
-        { xPos + w, yPos,       1.0, 1.0 },
-        { xPos,     yPos + h,   0.0, 0.0 },
-        { xPos + w, yPos,       1.0, 1.0 },
-        { xPos + w, yPos + h,   1.0, 0.0 }
-    };
+    GLfloat vertices[6][4] = {{xPos, yPos + h, 0.0, 0.0}, {xPos, yPos, 0.0, 1.0},     {xPos + w, yPos, 1.0, 1.0},
+                              {xPos, yPos + h, 0.0, 0.0}, {xPos + w, yPos, 1.0, 1.0}, {xPos + w, yPos + h, 1.0, 0.0}};
 
     // update content of VBO memory
     glBindVertexArray(vao);

@@ -14,5 +14,5 @@ void Player::release() {
     delete spaceshipModel;
     spaceshipModel = nullptr;
     SPDLOG_INFO("Model released");
-  } // TODO: be careful with releasing when models are still drawing
+  }
 }

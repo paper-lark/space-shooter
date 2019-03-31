@@ -7,18 +7,14 @@
 
 class Camera {
   glm::vec3 position = glm::vec3(0.f, 1.f, 0.f);
-  glm::quat orientation = glm::normalize(glm::angleAxis(0.f, glm::vec3(1, 0, 0)) * glm::angleAxis(0.f, glm::vec3(0, 1, 0)) * glm::angleAxis(0.f, glm::vec3(0, 0, 1)));
-  float fov = 45.f;         // camera field of view in deg
-  const float speed = 0.5f; // camera movement speed
+  glm::quat orientation =
+      glm::normalize(glm::angleAxis(0.f, glm::vec3(1, 0, 0)) * glm::angleAxis(0.f, glm::vec3(0, 1, 0)) *
+                     glm::angleAxis(0.f, glm::vec3(0, 0, 1)));
+  float fov = 45.f; // camera field of view in deg
 
 public:
-
   // Set camera position
-  // TODO: remove `move()`
   void updatePosition(glm::vec3 pos);
-
-  // Move camera
-  void move(glm::vec3 direction);
 
   // Get View matrix (world -> view)
   glm::mat4 getViewMatrix() const;
