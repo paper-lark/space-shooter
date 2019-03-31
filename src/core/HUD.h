@@ -24,16 +24,15 @@ class HUD {
   GLuint vao;
   GLuint vbo;
 
-  void RenderText(Shader &s, const std::string &text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color);
+  void RenderText(Shader &shader, const std::string &text, glm::vec2 position, GLfloat scale);
 
 public:
   HUD(const std::string &path);
+  HUD(const HUD &) = delete;
+  ~HUD();
 
   // Draw HUD on the screen
-  void Draw(Shader &shader);
-
-  // Release buffers
-  // TODO: ~HUD() {}
+  void Draw(Shader &shader, glm::ivec2 windowSize, unsigned health, unsigned score);
 };
 
 #endif // SPACESHOOTER_HUD_H

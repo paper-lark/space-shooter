@@ -6,14 +6,7 @@
 #include <GLFW/glfw3.h>
 
 class Callback {
-
 public:
-  // Current window size
-  static GLint windowSize[2]; // FIXME: remove
-
-  // Window resize callback
-  static void windowResize(GLFWwindow *, GLint width, GLint height);
-
   // Error callback
   static void error(int code, const char *description);
 };

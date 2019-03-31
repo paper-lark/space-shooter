@@ -1,6 +1,7 @@
 #include "Camera.h"
-#include "Callback.h"
 #include "../utils/QuatHelpers.h"
+#include "Application.h"
+#include "Callback.h"
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -16,7 +17,8 @@ void Camera::updatePosition(glm::vec3 pos) {
 
 // Get projection matrix (view -> clip)
 glm::mat4 Camera::getProjectionMatrix() const {
-  return glm::perspective(glm::radians(fov), float(Callback::windowSize[0]) / Callback::windowSize[1], 0.1f, 250.0f);
+  glm::ivec2 windowSize = Application::getSingleton().getWindowSize();
+  return glm::perspective(glm::radians(fov), float(windowSize.x) / windowSize.y, 0.1f, 250.0f);
 }
 
 // Get orientation

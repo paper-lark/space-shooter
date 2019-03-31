@@ -174,7 +174,7 @@ void startGameLoop(GLFWwindow *window, Application &app) {
     skybox.draw(app.camera);
 
     // draw HUD
-    hud.Draw(hudShader);
+    hud.Draw(hudShader, app.getWindowSize(), player.getHealth(), app.getScore());
 
     // update color buffers
     glfwSwapBuffers(window); // swap front and back color buffers
@@ -212,7 +212,6 @@ int main(int, char **) {
   Application::initialize(window);
 
   // Register event callbacks
-  glfwSetFramebufferSizeCallback(window, Callback::windowResize);
   glfwSetErrorCallback(Callback::error);
   glfwSetCursorPosCallback(window, [](GLFWwindow *window, double posX, double posY) {
     Application::getSingleton().processMouseInput(window, posX, posY);

@@ -85,3 +85,13 @@ float Application::getDeltaTime() const {
 void Application::bindPlayer(Player *p) {
   player = p;
 }
+
+unsigned Application::getScore() const {
+  return score;
+}
+
+glm::ivec2 Application::getWindowSize() const {
+  glm::ivec2 size;
+  glfwGetWindowSize(window, &size.x, &size.y);
+  return size;
+}

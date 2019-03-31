@@ -38,6 +38,10 @@ glm::quat Object::getOrientation() const {
   return orientation;
 }
 
+unsigned Object::getHealth() const {
+  return health;
+}
+
 glm::quat Object::rotate(glm::quat rotation) {
   orientation = glm::normalize(orientation * rotation);
   return orientation;

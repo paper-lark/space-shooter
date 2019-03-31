@@ -54,6 +54,9 @@ public:
   // Get object orientation
   glm::quat getOrientation() const;
 
+  // Get health
+  unsigned getHealth() const;
+
   // Get a flag whether the object is still alive
   bool isAlive() const;
 

@@ -13,7 +13,7 @@ HUD::HUD(const std::string &path) {
   if (FT_New_Face(library, path.c_str(), 0, &font)) {
     throw std::runtime_error("Failed to load font: " + path);
   }
-  FT_Set_Pixel_Sizes(font, 0, 64);
+  FT_Set_Pixel_Sizes(font, 0, 24);
 
   // generate glyph bitmaps for first 128 ASCII characters
   SPDLOG_INFO("Rendering character bitmaps...");
@@ -53,7 +53,7 @@ HUD::HUD(const std::string &path) {
         GLuint(font->glyph->advance.x)
     };
     characters.insert(std::make_pair(GLchar(ch), character));
-  }
+  } // TODO: reuse `Texture` class
   SPDLOG_INFO("Current map size: {}", characters.size());
 
   // release library resources
@@ -72,16 +72,12 @@ HUD::HUD(const std::string &path) {
   glBindVertexArray(0);
 }
 
-void HUD::RenderText(Shader &shader, const std::string &text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color) {
-
-  // activate shader
-  shader.setVec3("textColor", color);
-
+void HUD::RenderText(Shader &shader, const std::string &text, glm::vec2 position, GLfloat scale) {
   // iterate through the text
   for (GLchar c : text) {
     Character ch = characters[c]; // TODO: what if character is not present?
-    GLfloat xPos = x + ch.bearing.x * scale;
-    GLfloat yPos = y - (ch.size.y - ch.bearing.y) * scale;
+    GLfloat xPos = position.x + ch.bearing.x * scale;
+    GLfloat yPos = position.y - (ch.size.y - ch.bearing.y) * scale;
     GLfloat w = ch.size.x * scale;
     GLfloat h = ch.size.y * scale;
 
@@ -106,7 +102,7 @@ void HUD::RenderText(Shader &shader, const std::string &text, GLfloat x, GLfloat
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, ch.textureID);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    x += (ch.advance >> 6u) * scale;
+    position.x += (ch.advance >> 6u) * scale;
   }
 
   // bind dummy vao and texture
@@ -114,9 +110,17 @@ void HUD::RenderText(Shader &shader, const std::string &text, GLfloat x, GLfloat
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void HUD::Draw(Shader &shader) {
+void HUD::Draw(Shader &shader, glm::ivec2 windowSize, unsigned health, unsigned score) {
   shader.use();
-  glm::mat4 projectionMatrix = glm::ortho(0.f, 800.f, 0.f, 600.f); // TODO: not working
+  glm::mat4 projectionMatrix = glm::ortho(0.f, float(windowSize.x), 0.f, float(windowSize.y));
   shader.setMatrix("projection", projectionMatrix);
-  RenderText(shader, "Some text", 10.f, 10.f, 1.0f, glm::vec3(0.5f, 0.8f, 0.2f));
+  shader.setVec3("textColor", glm::vec3(0.9f, 0.9f, 0.9f));
+  RenderText(shader, "Health: " + std::to_string(health), glm::vec2(10.f, 10.f), 1.0f);
+  RenderText(shader, "Score:  " + std::to_string(score), glm::vec2(10.f, 34.f), 1.0f);
+}
+
+HUD::~HUD() {
+  SPDLOG_INFO("Destructing HUD");
+  glDeleteVertexArrays(1, &vao);
+  glDeleteBuffers(1, &vbo);
 }

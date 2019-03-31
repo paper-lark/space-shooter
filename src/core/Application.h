@@ -17,6 +17,7 @@ private:
   const float sensitivity = 0.05f; // mouse sensitivity
   CameraPosition cameraPosition = CameraPosition::ThirdPerson;
   static Application &instance;
+  unsigned score = 0;
 
 public:
   // Application camera object
@@ -37,8 +38,14 @@ public:
   // Get delta time from previous render
   float getDeltaTime() const;
 
+  // Get score
+  unsigned getScore() const;
+
   // Bind player to the application
   void bindPlayer(Player *p);
+
+  // Get window size
+  glm::ivec2 getWindowSize() const;
 
   // Initialize application singleton
   static void initialize(GLFWwindow *window) {
