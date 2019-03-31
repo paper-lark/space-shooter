@@ -9,7 +9,7 @@ class Object {
   const Model *model;
   unsigned health;
   glm::vec3 position;
-  glm::vec3 size; // TODO: use size for AABB
+  float bboxSize;
   float scale;
   glm::quat orientation;
   float speed = 0.f;
@@ -17,9 +17,9 @@ class Object {
 
 public:
   // Constructor
-  Object(const Model *model, unsigned health, glm::vec3 position, glm::vec3 size, float scale, std::tuple<float, float> speedLimit,
+  Object(const Model *model, unsigned health, glm::vec3 position, float bboxSize, float scale, std::tuple<float, float> speedLimit,
          float yaw = 0, float pitch = 0, float roll = 0)
-      : model(model), health(health), position(position), size(size), scale(scale), speedLimit(std::move(speedLimit)) {
+      : model(model), health(health), position(position), bboxSize(bboxSize), scale(scale), speedLimit(std::move(speedLimit)) {
 
     glm::quat qPitch = glm::angleAxis(glm::radians(pitch), glm::vec3(1, 0, 0));
     glm::quat qYaw = glm::angleAxis(glm::radians(yaw), glm::vec3(0, 1, 0));
@@ -65,8 +65,8 @@ public:
   void draw(Shader &shader) const;
 
   // Get bounding box
-  std::tuple<glm::vec3, glm::vec3> getBBox() {
-    return std::make_tuple(position, size); // TODO: should be centered?
+  glm::vec4 getBBox() {
+    return glm::vec4(position, bboxSize); // TODO: should be centered?
   }
 
   // Update object. Should be called on each frame

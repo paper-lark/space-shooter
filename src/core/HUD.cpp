@@ -13,7 +13,7 @@ HUD::HUD(const std::string &path) {
   if (FT_New_Face(library, path.c_str(), 0, &font)) {
     throw std::runtime_error("Failed to load font: " + path);
   }
-  FT_Set_Pixel_Sizes(font, 0, 24);
+  FT_Set_Pixel_Sizes(font, 0, 128);
 
   // generate glyph bitmaps for first 128 ASCII characters
   SPDLOG_INFO("Rendering character bitmaps...");
@@ -60,10 +60,20 @@ HUD::HUD(const std::string &path) {
   glBindVertexArray(0);
 }
 
-void HUD::RenderText(Shader &shader, const std::string &text, glm::vec2 position, GLfloat scale) {
+float HUD::CalculateTextWidth(const std::string &text, GLfloat scale) const {
+  float result = 0.f;
+  for (GLchar c : text) {
+    const Character &ch = characters.at(c); // TODO: what if character is not present?
+    result += (ch.advance >> 6u) * scale;
+  }
+
+  return result;
+}
+
+void HUD::RenderText(Shader &shader, const std::string &text, glm::vec2 position, GLfloat scale) const {
   // iterate through the text
   for (GLchar c : text) {
-    Character ch = characters[c]; // TODO: what if character is not present?
+    const Character &ch = characters.at(c); // TODO: what if character is not present?
     GLfloat xPos = position.x + ch.bearing.x * scale;
     GLfloat yPos = position.y - (ch.size.y - ch.bearing.y) * scale;
     GLfloat w = ch.size.x * scale;
@@ -93,13 +103,26 @@ void HUD::RenderText(Shader &shader, const std::string &text, glm::vec2 position
 }
 
 void HUD::Draw(Shader &shader, glm::ivec2 windowSize, unsigned health, unsigned score) {
+  // setup shader
   shader.use();
   glm::mat4 projectionMatrix = glm::ortho(0.f, float(windowSize.x), 0.f, float(windowSize.y));
   shader.setMatrix("projection", projectionMatrix);
   shader.setVec3("textColor", glm::vec3(0.9f, 0.9f, 0.9f));
-  RenderText(shader, "Health: " + std::to_string(health), glm::vec2(10.f, 10.f), 1.0f);
-  RenderText(shader, "Score:  " + std::to_string(score), glm::vec2(10.f, 34.f), 1.0f);
-  RenderText(shader, "+", glm::vec2(windowSize.x * 0.5f, windowSize.y * 0.5f - 2.0f), 1.0f);
+
+  // draw statistics
+  RenderText(shader, "Health: " + std::to_string(health), glm::vec2(10.f, 10.f), 0.25f);
+  RenderText(shader, "Score:  " + std::to_string(score), glm::vec2(10.f, 34.f), 0.25f);
+
+  if (health == 0) {
+    // draw game over
+    float width = CalculateTextWidth("Game over", 0.75f);
+    RenderText(shader, "Game over", glm::vec2(windowSize.x * 0.5f - width * 0.5f, windowSize.y * 0.5f - 2.0f), 0.75f);
+  } else {
+    // draw crosshairs
+    // TODO: find something better
+    float width = CalculateTextWidth("+", 0.25f);
+    RenderText(shader, "+", glm::vec2(windowSize.x * 0.5f - width * 0.5, windowSize.y * 0.5f - 2.0f), 0.25f);
+  }
 }
 
 HUD::~HUD() {

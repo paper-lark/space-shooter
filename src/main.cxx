@@ -24,7 +24,6 @@
 #include <random>
 #include <spdlog/spdlog.h>
 
-#define length(x) (sizeof(x) / sizeof((x)[0]))
 #define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH 800
 #define WINDOW_TITLE "OpenGL Introduction"
@@ -68,14 +67,6 @@ int initializeGL() {
   return 0;
 }
 
-// Get light source model matrix (local -> world)
-glm::mat4 getLightModelMatrix(const glm::vec3 position) {
-  glm::mat4 matrix = glm::mat4(1.f);
-  matrix = glm::translate(matrix, position);
-  matrix = glm::scale(matrix, glm::vec3(30, 30, 30));
-  return matrix;
-}
-
 // Start game loop that ends when GLFW is signaled to close
 void startGameLoop(GLFWwindow *window, Application &app) {
   // create prerequisites
@@ -103,9 +94,6 @@ void startGameLoop(GLFWwindow *window, Application &app) {
     glfwSwapBuffers(window); // swap front and back color buffers
     glfwPollEvents();        // process all events
   }
-
-  // unbind player
-  app.bindPlayer(nullptr);
 }
 
 // Entry point

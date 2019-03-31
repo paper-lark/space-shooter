@@ -1,14 +1,15 @@
 #include "Scene.h"
 #include "../objects/Spaceship.h"
 #include "Application.h"
+#include <spdlog/spdlog.h>
 
 Scene::Scene() {
   player = new Player{1000, glm::vec3(0.f, 0.f, 0.f)};
   Application::getSingleton().bindPlayer(player);
   objects = {
       new Spaceship{100, glm::vec3(10.f, 6.f, -15.f)},  new Spaceship{100, glm::vec3(23.f, 11.f, 3.f)},
-      new Spaceship{100, glm::vec3(1.f, -12.f, -13.f)}, new Spaceship{1000, glm::vec3(12.f, 5.f, -1.f)},
-      new Spaceship{10000, glm::vec3(15.f, 2.f, 22.f)}, new Spaceship{10000, glm::vec3(-5.f, -12.f, -32.f)},
+      new Spaceship{100, glm::vec3(1.f, -12.f, -13.f)}, new Spaceship{100, glm::vec3(12.f, 5.f, -1.f)},
+      new Spaceship{100, glm::vec3(15.f, 2.f, 22.f)},   new Spaceship{100, glm::vec3(-5.f, -12.f, -32.f)},
   };
   stars = {
       new Star{1000000, glm::vec3(105.7f, 13.75f, 19.0f)},
@@ -84,9 +85,24 @@ void Scene::draw(Camera &camera) {
   skybox->draw(camera);
 }
 
-bool isBoundingBoxColliding(glm::vec3 posA, glm::vec3 dimsA, glm::vec3 posB, glm::vec3 dimsB) {
+bool isBoundingBoxColliding(glm::vec4 bboxA, glm::vec4 bboxB) {
   // TODO: implement
-  return false;
+  glm::vec3 sizeA{bboxA};
+  glm::vec3 sizeB{bboxB};
+  return glm::length(sizeA - sizeB) < bboxA.w + bboxB.w;
+}
+
+void resolveCollision(Object *first, Object *second) {
+  glm::vec4 bboxA = first->getBBox();
+  glm::vec4 bboxB = second->getBBox();
+
+  if (isBoundingBoxColliding(bboxA, bboxB)) {
+    SPDLOG_INFO("Collision detected: {} {} {} and {} {} {}", bboxA.x, bboxA.y, bboxA.z, bboxB.x, bboxB.y, bboxB.z);
+    unsigned damage = std::min(first->getHealth(), second->getHealth());
+    SPDLOG_INFO("Inflicting {} pts of damage", damage);
+    first->applyDamage(damage);
+    second->applyDamage(damage);
+  }
 }
 
 void Scene::update(float deltaTime) {
@@ -99,16 +115,20 @@ void Scene::update(float deltaTime) {
   }
 
   // check collisions
-  // TODO: check with stars and player too
   for (Object *obj : objects) {
     for (Object *other : objects) {
-      if (isBoundingBoxColliding(std::get<0>(obj->getBBox()), std::get<1>(obj->getBBox()),
-                                 std::get<0>(other->getBBox()), std::get<1>(obj->getBBox()))) {
-        unsigned damage = std::min(obj->getHealth(), other->getHealth());
-        obj->applyDamage(damage);
-        other->applyDamage(damage);
+      if (obj == other) {
+        continue;
       }
+      resolveCollision(obj, other);
     }
+    resolveCollision(obj, player);
+  }
+  for (Star *star : stars) {
+    for (Object *other : objects) {
+      resolveCollision(star, other);
+    }
+    resolveCollision(star, player);
   }
 
   // remove all dead objects

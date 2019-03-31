@@ -24,7 +24,8 @@ class HUD {
   GLuint vao;
   GLuint vbo;
 
-  void RenderText(Shader &shader, const std::string &text, glm::vec2 position, GLfloat scale);
+  void RenderText(Shader &shader, const std::string &text, glm::vec2 position, GLfloat scale) const;
+  float CalculateTextWidth(const std::string &text, GLfloat scale) const;
 
 public:
   HUD(const std::string &path);
