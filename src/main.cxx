@@ -34,6 +34,7 @@ void initializeGLFW() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+  glfwWindowHint(GLFW_SAMPLES, 4);
 }
 
 // Initialize OpenGL
@@ -57,6 +58,9 @@ int initializeGL() {
 
   // enable face culling
   glEnable(GL_CULL_FACE);
+
+  // enable multisampling
+  glEnable(GL_MULTISAMPLE);
 
   return 0;
 }

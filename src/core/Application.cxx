@@ -69,8 +69,8 @@ void Application::update() {
   if (player != nullptr) {
     auto orientation = player->getOrientation();
     glm::vec3 cameraOffset = cameraPosition == CameraPosition::FirstPerson ?
-        + 5.f * QuatHelpers::getForward(orientation) :
-        - 15.f * QuatHelpers::getForward(orientation) + QuatHelpers::getUp(orientation) * 3.f;
+        + 1.f * QuatHelpers::getForward(orientation) + QuatHelpers::getUp(orientation) * 2.5f :
+        - 10.f * QuatHelpers::getForward(orientation) + QuatHelpers::getUp(orientation) * 2.5f;
     camera.updatePosition(player->getPosition() + cameraOffset);
     camera.setOrientation(player->getOrientation());
   }
