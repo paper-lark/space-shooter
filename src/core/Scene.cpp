@@ -5,7 +5,6 @@
 
 Scene::Scene() {
   player = new Player{1000, glm::vec3(0.f, 0.f, 0.f)};
-  Application::getSingleton().bindPlayer(player);
   objects = {
       new Spaceship{100, glm::vec3(10.f, 6.f, -15.f)},  new Spaceship{100, glm::vec3(23.f, 11.f, 3.f)},
       new Spaceship{100, glm::vec3(1.f, -12.f, -13.f)}, new Spaceship{100, glm::vec3(12.f, 5.f, -1.f)},
@@ -24,7 +23,6 @@ Scene::Scene() {
 }
 
 Scene::~Scene() {
-  Application::getSingleton().bindPlayer(nullptr);
   delete skybox;
   delete player;
   std::for_each(stars.begin(), stars.end(), [](Star *star) { delete star; });
@@ -143,6 +141,10 @@ void Scene::update(float deltaTime) {
                 objects.end());
 }
 
-const Player *Scene::getPlayer() {
+Player *Scene::getPlayer() {
   return player;
+}
+
+void Scene::addObject(Object *obj) {
+  objects.push_back(obj);
 }

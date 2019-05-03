@@ -5,6 +5,7 @@
 #include "../objects/Player.h"
 #include "Camera.h"
 #include "CameraPosition.h"
+#include "Scene.h"
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
@@ -13,8 +14,10 @@ private:
   GLFWwindow *window;
   double previousMoment = 0.0;
   double deltaTime = 0.0;
-  Player *player = nullptr;
+  Scene *scene = nullptr;
   const float sensitivity = 0.05f; // mouse sensitivity
+  const double fireCooldown = 1;
+  double lastFireTime = 0;
   CameraPosition cameraPosition = CameraPosition::ThirdPerson;
   static Application &instance;
   unsigned score = 0;
@@ -41,8 +44,8 @@ public:
   // Get score
   unsigned getScore() const;
 
-  // Bind player to the application
-  void bindPlayer(Player *p);
+  // Bind scene to the application
+  void bindScene(Scene *p);
 
   // Get window size
   glm::ivec2 getWindowSize() const;

@@ -6,6 +6,7 @@
 #include <spdlog/spdlog.h>
 
 class Object {
+protected:
   const Model *model;
   unsigned health;
   glm::vec3 position;
@@ -13,18 +14,27 @@ class Object {
   float scale;
   glm::quat orientation;
   float speed = 0.f;
+  const glm::quat modelRotation;
   std::tuple<float, float> speedLimit;
 
 public:
   // Constructor
   Object(const Model *model, unsigned health, glm::vec3 position, float bboxSize, float scale, std::tuple<float, float> speedLimit,
+      glm::quat modelRotation = glm::angleAxis(0.f, glm::vec3(1, 0, 0)),
          float yaw = 0, float pitch = 0, float roll = 0)
-      : model(model), health(health), position(position), bboxSize(bboxSize), scale(scale), speedLimit(std::move(speedLimit)) {
+      : model(model), health(health), position(position), bboxSize(bboxSize), scale(scale), orientation(), modelRotation(modelRotation), speedLimit(std::move(speedLimit)) {
 
     glm::quat qPitch = glm::angleAxis(glm::radians(pitch), glm::vec3(1, 0, 0));
     glm::quat qYaw = glm::angleAxis(glm::radians(yaw), glm::vec3(0, 1, 0));
     glm::quat qRoll = glm::angleAxis(glm::radians(roll), glm::vec3(0, 0, 1));
     orientation = glm::normalize(qPitch * qYaw * qRoll);
+    SPDLOG_INFO("Created");
+  }
+
+  // Constructor
+  Object(const Model *model, unsigned health, glm::vec3 position, float bboxSize, float scale, std::tuple<float, float> speedLimit,
+         glm::quat orientation, glm::quat modelRotation)
+      : model(model), health(health), position(position), bboxSize(bboxSize), scale(scale), orientation(orientation), modelRotation(modelRotation), speedLimit(std::move(speedLimit)) {
     SPDLOG_INFO("Created");
   }
 

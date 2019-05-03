@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "../objects/Torpedo.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
@@ -27,20 +28,33 @@ void Application::processKeyboardInput() {
     cameraPosition = CameraPosition::FirstPerson;
   }
 
-  // Player movement
-  if (player != nullptr) {
+  // Player actions
+  if (scene != nullptr) {
+    Player *player = scene->getPlayer();
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
       player->updateSpeed(0.5f * getDeltaTime());
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
       player->updateSpeed(-0.275f * getDeltaTime());
     }
+    if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+      double now = glfwGetTime();
+      if (now >= lastFireTime + fireCooldown) {
+        scene->addObject(new Torpedo{
+            1000,
+            player->getPosition() + 3.f * QuatHelpers::getForward(player->getOrientation()),
+            player->getOrientation()
+        });
+        lastFireTime = now;
+      }
+    }
   }
 }
 
 // Process mouse input
 void Application::processMouseInput(GLFWwindow *, double posX, double posY) {
-  if (player != nullptr) {
+  if (scene != nullptr) {
+    Player *player = scene->getPlayer();
     static double lastX = posX, lastY = posY;
 
     float offsetX = float(posX - lastX) * sensitivity;
@@ -66,7 +80,8 @@ void Application::update() {
   processKeyboardInput();
 
   // update camera position and orientation
-  if (player != nullptr) {
+  if (scene != nullptr) {
+    Player *player = scene->getPlayer();
     auto orientation = player->getOrientation();
     glm::vec3 cameraOffset = cameraPosition == CameraPosition::FirstPerson ?
         + 1.f * QuatHelpers::getForward(orientation) + QuatHelpers::getUp(orientation) * 2.5f :
@@ -82,8 +97,8 @@ float Application::getDeltaTime() const {
 }
 
 // Bind player to the application
-void Application::bindPlayer(Player *p) {
-  player = p;
+void Application::bindScene(Scene *sc) {
+  scene = sc;
 }
 
 unsigned Application::getScore() const {

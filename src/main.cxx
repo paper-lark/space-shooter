@@ -10,6 +10,7 @@
 #include "objects/Player.h"
 #include "objects/Spaceship.h"
 #include "objects/Star.h"
+#include "objects/Torpedo.h"
 #include "representation/Model.h"
 #include "representation/Shader.h"
 #include "representation/Skybox.h"
@@ -73,6 +74,7 @@ void startGameLoop(GLFWwindow *window, Application &app) {
   HUD hud("assets/Fonts/ShareTechMono.ttf");
   Shader hudShader = Shader("hud/vertex.glsl", "hud/fragment.glsl");
   Scene scene{};
+  app.bindScene(&scene);
 
   while (!glfwWindowShouldClose(window)) {
     // update application
@@ -94,6 +96,7 @@ void startGameLoop(GLFWwindow *window, Application &app) {
     glfwSwapBuffers(window); // swap front and back color buffers
     glfwPollEvents();        // process all events
   }
+  app.bindScene(nullptr);
 }
 
 // Entry point
@@ -134,6 +137,7 @@ int main(int, char **) {
   Spaceship::init();
   Player::init();
   Star::init();
+  Torpedo::init();
 
   // Start game loop
   SPDLOG_INFO("Starting game loop...");
@@ -144,6 +148,7 @@ int main(int, char **) {
   Spaceship::release();
   Player::release();
   Star::release();
+  Torpedo::release();
   glfwTerminate();
   return 0;
 }

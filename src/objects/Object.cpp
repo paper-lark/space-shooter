@@ -3,7 +3,7 @@
 #include "../utils/Box.h"
 
 glm::mat4 Object::getObjectModelMatrix() const {
-  glm::mat4 rotate = glm::mat4_cast(orientation);
+  glm::mat4 rotate = glm::mat4_cast(glm::normalize(orientation * modelRotation));
   glm::mat4 translate = glm::translate(glm::mat4(1.f), position);
   translate = glm::scale(translate, glm::vec3(scale));
   return translate * rotate;

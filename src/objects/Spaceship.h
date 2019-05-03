@@ -16,7 +16,7 @@ public:
       : Object(spaceshipModel, health, position, 3.f, 0.005f, std::make_tuple(0.f, 0.f)) {} // TODO: std::make_tuple(0.1f, 3.f)
 
   // Update object. Should be called on each frame
-  void update(float deltaTime);
+  void update(float deltaTime) override;
 };
 
 #endif // SPACESHOOTER_SPACESHIP_H

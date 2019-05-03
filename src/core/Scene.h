@@ -18,10 +18,11 @@ public:
   Scene();
   ~Scene();
 
+  void addObject(Object *obj);
   void draw(Camera &camera);
   void update(float deltaTime);
 
-  const Player *getPlayer();
+  Player *getPlayer();
 };
 
 
