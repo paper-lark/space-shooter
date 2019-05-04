@@ -28,6 +28,8 @@
 #define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH 800
 #define WINDOW_TITLE "OpenGL Introduction"
+#define GAME_OVER_DELAY 5.f
+//#define GOD_MODE
 
 // Initialize GLFW
 void initializeGLFW() {
@@ -49,7 +51,8 @@ int initializeGL() {
 
   // output graphics adapter information
   SPDLOG_DEBUG("Device info: {}", glGetString(GL_RENDERER));
-  SPDLOG_DEBUG("OpenGL Version: {}, {}", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
+  SPDLOG_DEBUG("OpenGL Version: {}, {}", glGetString(GL_VERSION),
+               glGetString(GL_SHADING_LANGUAGE_VERSION));
 
   // enable depth buffer
   glEnable(GL_DEPTH_TEST);
@@ -71,6 +74,7 @@ int initializeGL() {
 // Start game loop that ends when GLFW is signaled to close
 void startGameLoop(GLFWwindow *window, Application &app) {
   // create prerequisites
+  static float gameOverTimeout = GAME_OVER_DELAY;
   HUD hud("assets/Fonts/ShareTechMono.ttf");
   Shader hudShader = Shader("hud/vertex.glsl", "hud/fragment.glsl");
   Scene scene{};
@@ -79,6 +83,7 @@ void startGameLoop(GLFWwindow *window, Application &app) {
   while (!glfwWindowShouldClose(window)) {
     // update application
     app.update();
+    unsigned playerHealth = scene.getPlayer()->getHealth();
 
     // clear screen
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -86,11 +91,19 @@ void startGameLoop(GLFWwindow *window, Application &app) {
 
     // draw scene and HUD
     scene.draw(app.camera);
-    hud.Draw(hudShader, app.getWindowSize(), scene.getPlayer()->getHealth(), app.getScore());
+    hud.Draw(hudShader, app.getWindowSize(), app.calculateCrosshairOffset(),
+             playerHealth, app.getScore());
 
     // update scene
-    scene.update(app.getDeltaTime());
-    // TODO: check player health
+    unsigned score = scene.update(app.getDeltaTime());
+    if (playerHealth > 0) {
+      app.updateScore(score);
+    } else {
+      gameOverTimeout -= app.getDeltaTime();
+      if (gameOverTimeout < 0.f) {
+        break;
+      }
+    }
 
     // update color buffers
     glfwSwapBuffers(window); // swap front and back color buffers
@@ -108,7 +121,8 @@ int main(int, char **) {
 
   // Create window
   initializeGLFW();
-  GLFWwindow *window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
+  GLFWwindow *window =
+      glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
   if (window == nullptr) {
     SPDLOG_ERROR("Failed to create a window, terminating...");
     glfwTerminate();

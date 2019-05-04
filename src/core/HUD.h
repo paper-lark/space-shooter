@@ -21,8 +21,8 @@ struct Character {
 
 class HUD {
   std::map<GLchar, Character> characters;
-  GLuint vao;
-  GLuint vbo;
+  GLuint vao = 0;
+  GLuint vbo = 0;
 
   void RenderText(Shader &shader, const std::string &text, glm::vec2 position, GLfloat scale) const;
   float CalculateTextWidth(const std::string &text, GLfloat scale) const;
@@ -33,7 +33,7 @@ public:
   ~HUD();
 
   // Draw HUD on the screen
-  void Draw(Shader &shader, glm::ivec2 windowSize, unsigned health, unsigned score);
+  void Draw(Shader &shader, glm::ivec2 windowSize, glm::vec2 crosshairOffset, unsigned health, unsigned score);
 };
 
 #endif // SPACESHOOTER_HUD_H

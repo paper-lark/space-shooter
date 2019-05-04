@@ -28,8 +28,8 @@ HUD::HUD(const std::string &path) {
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, font->glyph->bitmap.width, font->glyph->bitmap.rows, 0, GL_RED,
-                 GL_UNSIGNED_BYTE, font->glyph->bitmap.buffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, font->glyph->bitmap.width, font->glyph->bitmap.rows, 0,
+                 GL_RED, GL_UNSIGNED_BYTE, font->glyph->bitmap.buffer);
     // set texture options
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -70,7 +70,8 @@ float HUD::CalculateTextWidth(const std::string &text, GLfloat scale) const {
   return result;
 }
 
-void HUD::RenderText(Shader &shader, const std::string &text, glm::vec2 position, GLfloat scale) const {
+void HUD::RenderText(Shader &shader, const std::string &text, glm::vec2 position,
+                     GLfloat scale) const {
   // iterate through the text
   for (GLchar c : text) {
     const Character &ch = characters.at(c); // TODO: what if character is not present?
@@ -80,8 +81,9 @@ void HUD::RenderText(Shader &shader, const std::string &text, glm::vec2 position
     GLfloat h = ch.size.y * scale;
 
     // update VBO for each character
-    GLfloat vertices[6][4] = {{xPos, yPos + h, 0.0, 0.0}, {xPos, yPos, 0.0, 1.0},     {xPos + w, yPos, 1.0, 1.0},
-                              {xPos, yPos + h, 0.0, 0.0}, {xPos + w, yPos, 1.0, 1.0}, {xPos + w, yPos + h, 1.0, 0.0}};
+    GLfloat vertices[6][4] = {{xPos, yPos + h, 0.0, 0.0}, {xPos, yPos, 0.0, 1.0},
+                              {xPos + w, yPos, 1.0, 1.0}, {xPos, yPos + h, 0.0, 0.0},
+                              {xPos + w, yPos, 1.0, 1.0}, {xPos + w, yPos + h, 1.0, 0.0}};
 
     // update content of VBO memory
     glBindVertexArray(vao);
@@ -102,7 +104,8 @@ void HUD::RenderText(Shader &shader, const std::string &text, glm::vec2 position
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void HUD::Draw(Shader &shader, glm::ivec2 windowSize, unsigned health, unsigned score) {
+void HUD::Draw(Shader &shader, glm::ivec2 windowSize, glm::vec2 crosshairOffset, unsigned health,
+               unsigned score) {
   // setup shader
   shader.use();
   glm::mat4 projectionMatrix = glm::ortho(0.f, float(windowSize.x), 0.f, float(windowSize.y));
@@ -110,18 +113,23 @@ void HUD::Draw(Shader &shader, glm::ivec2 windowSize, unsigned health, unsigned 
   shader.setVec3("textColor", glm::vec3(0.9f, 0.9f, 0.9f));
 
   // draw statistics
-  RenderText(shader, "Health: " + std::to_string(health), glm::vec2(10.f, 10.f), 0.25f);
-  RenderText(shader, "Score:  " + std::to_string(score), glm::vec2(10.f, 34.f), 0.25f);
+  RenderText(shader, "Health: " + std::to_string(health), glm::vec2(16.f, 16.f), 0.25f);
+  RenderText(shader, "Score:  " + std::to_string(score), glm::vec2(16.f, 48.f), 0.25f);
 
   if (health == 0) {
     // draw game over
-    float width = CalculateTextWidth("Game over", 0.75f);
-    RenderText(shader, "Game over", glm::vec2(windowSize.x * 0.5f - width * 0.5f, windowSize.y * 0.5f - 2.0f), 0.75f);
+    float scale = 0.75f;
+    float width = CalculateTextWidth("Game over", scale);
+    RenderText(shader, "Game over",
+               glm::vec2(windowSize.x * 0.5f - width * 0.5f, windowSize.y * 0.5f - 2.0f), scale);
   } else {
     // draw crosshairs
-    // TODO: find something better
-    float width = CalculateTextWidth("+", 0.25f);
-    RenderText(shader, "+", glm::vec2(windowSize.x * 0.5f - width * 0.5, windowSize.y * 0.5f - 2.0f), 0.25f);
+    // TODO: find a better crosshairs texture
+    float scale = 0.25f;
+    float width = CalculateTextWidth("+", scale);
+    RenderText(shader, "+",
+               glm::vec2(windowSize.x * 0.5f - width * 0.5, windowSize.y * 0.5f) + crosshairOffset,
+               scale);
   }
 }
 

@@ -14,10 +14,10 @@ public:
   static void release();
 
   Torpedo(unsigned health, const glm::vec3 position)
-      : Object(torpedoModel, health, position, 0.1f, 0.1f, std::make_tuple(15.f, 20.f), glm::angleAxis(glm::radians(90.f), glm::vec3(0, 1, 0))) {}
+      : Object(torpedoModel, health, position, 0.1f, 0.1f, std::make_tuple(30.f, 55.f), glm::angleAxis(glm::radians(90.f), glm::vec3(0, 1, 0))) {}
 
   Torpedo(unsigned health, const glm::vec3 position, glm::quat orientation)
-      : Object(torpedoModel, health, position, 0.1f, 0.1f, std::make_tuple(15.f, 20.f), orientation, glm::angleAxis(glm::radians(90.f), glm::vec3(0, 1, 0))) {}
+      : Object(torpedoModel, health, position, 0.1f, 0.1f, std::make_tuple(30.f, 55.f), orientation, glm::quat(1.f, 0.f, 0.f, 0.f)) {}
 
   // Update object. Should be called on each frame
   void update(float deltaTime) override;

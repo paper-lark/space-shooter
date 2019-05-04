@@ -1,7 +1,6 @@
 #ifndef SPACESHOOTER_CALLBACKS_H
 #define SPACESHOOTER_CALLBACKS_H
 
-#define GL_SILENCE_DEPRECATION
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 

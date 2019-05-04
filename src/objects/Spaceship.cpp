@@ -1,5 +1,8 @@
 #include "Spaceship.h"
+#include "../core/Application.h"
 #include <spdlog/spdlog.h>
+
+#define FIRE_COOLDOWN 3.f
 
 Model *Spaceship::spaceshipModel = nullptr;
 
@@ -17,6 +20,19 @@ void Spaceship::release() {
 }
 
 void Spaceship::update(float deltaTime) {
-  this->updateSpeed(0.1f * deltaTime);
+  this->update(deltaTime, false);
+}
+
+void Spaceship::update(float deltaTime, bool shouldFire) {
+  timeSinceFire += deltaTime;
   Object::update(deltaTime);
+
+  if (shouldFire && timeSinceFire > FIRE_COOLDOWN) {
+    SPDLOG_INFO("Firing at {} {} {}", position.x, position.y, position.z);
+    auto scene = Application::getSingleton().getScene();
+    if (scene != nullptr) {
+      scene->createTorpedo(position, orientation);
+    }
+    timeSinceFire = 0;
+  }
 }

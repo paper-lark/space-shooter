@@ -1,7 +1,6 @@
 #ifndef SPACESHOOTER_APPLICATION_H
 #define SPACESHOOTER_APPLICATION_H
 
-#define GL_SILENCE_DEPRECATION
 #include "../objects/Player.h"
 #include "Camera.h"
 #include "CameraPosition.h"
@@ -9,25 +8,30 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
+#define MOUSE_SENSITIVITY 0.075f
+#define PLAYER_FIRE_COOLDOWN 1.f
+
 class Application {
 private:
   GLFWwindow *window;
   double previousMoment = 0.0;
   double deltaTime = 0.0;
   Scene *scene = nullptr;
-  const float sensitivity = 0.05f; // mouse sensitivity
-  const double fireCooldown = 1;
   double lastFireTime = 0;
   CameraPosition cameraPosition = CameraPosition::ThirdPerson;
   static Application &instance;
   unsigned score = 0;
+
+
+  // Update camera position depending on the camera mode
+  void updateCameraPosition();
 
 public:
   // Application camera object
   Camera camera;
 
   // Constructor
-  Application(GLFWwindow *window = nullptr) : window(window) {}
+  explicit Application(GLFWwindow *window = nullptr) : window(window) {}
 
   // Process keyboard input
   void processKeyboardInput();
@@ -44,6 +48,9 @@ public:
   // Get score
   unsigned getScore() const;
 
+  // Update score
+  void updateScore(unsigned delta);
+
   // Bind scene to the application
   void bindScene(Scene *p);
 
@@ -59,6 +66,14 @@ public:
   static Application &getSingleton() {
     return Application::instance;
   }
+
+  // Get scene
+  Scene *getScene() const {
+    return scene;
+  }
+
+  // Calculate crosshair offset from the center of the HUD depending on the camera mode
+  glm::vec2 calculateCrosshairOffset();
 };
 
 #endif // SPACESHOOTER_APPLICATION_H

@@ -27,12 +27,12 @@ public:
                  glm::vec3(1.0f, 1.0f, 1.0f),
 
                  1.0,
-                 0.09,
-                 0.032};
+                 0.0032,
+                 0.0016};
   }
 
   Star(unsigned health, const glm::vec3 position)
-      : Object(starModel, health, position, 0.75f, 30.f, std::make_tuple(0.f, 0.f)) {}
+      : Object(starModel, health, position, 0.f, 100.f, std::make_tuple(3.f, 3.f)) {}
 };
 
 #endif // SPACESHOOTER_STAR_H

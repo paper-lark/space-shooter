@@ -17,6 +17,6 @@ void Torpedo::release() {
 }
 
 void Torpedo::update(float deltaTime) {
-  this->updateSpeed(0.5f * deltaTime);
+  this->updateSpeed(1.f * deltaTime);
   Object::update(deltaTime);
 }

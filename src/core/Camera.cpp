@@ -13,7 +13,7 @@ void Camera::updatePosition(glm::vec3 pos) {
 // Get projection matrix (view -> clip)
 glm::mat4 Camera::getProjectionMatrix() const {
   glm::ivec2 windowSize = Application::getSingleton().getWindowSize();
-  return glm::perspective(glm::radians(fov), float(windowSize.x) / windowSize.y, 0.1f, 250.0f);
+  return glm::perspectiveFov(glm::radians(CAMERA_FOV), float(windowSize.x), float(windowSize.y), CAMERA_MIN_DEPTH, CAMERA_MAX_DEPTH);
 }
 
 // Get orientation

@@ -114,13 +114,17 @@ void main() {
 	light += calculateDirectionalLight(dirLight, normal, viewDir);
 
 	for (int i = 0; i < POINT_LIGHTS_COUNT; i++) {
+		if (pointLights[i].position == vec3(0, 0, 0)) {
+			continue;
+		}
+
 		vec3 delta = calculatePointLight(pointLights[i], normal, viewDir);
 		light += delta;
 	}
 	light += calculateFlashlightLight(flashlight, normal, viewDir);
 
 	// calculate health level
-	float healthLevel = min(health / 150.f + 0.25f, 1.f);
+	float healthLevel = min(health / 100.f + 0.25f, 1.f);
 
     FragColor = vec4(light * healthLevel, 1.f);
 }

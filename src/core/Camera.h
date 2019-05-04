@@ -5,13 +5,15 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#define CAMERA_FOV 45.f
+#define CAMERA_MIN_DEPTH 2.5f
+#define CAMERA_MAX_DEPTH 750.f
+
 class Camera {
   glm::vec3 position = glm::vec3(0.f, 1.f, 0.f);
   glm::quat orientation =
       glm::normalize(glm::angleAxis(0.f, glm::vec3(1, 0, 0)) * glm::angleAxis(0.f, glm::vec3(0, 1, 0)) *
                      glm::angleAxis(0.f, glm::vec3(0, 0, 1)));
-  float fov = 45.f; // camera field of view in deg
-
 public:
   // Set camera position
   void updatePosition(glm::vec3 pos);

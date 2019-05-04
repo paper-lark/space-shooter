@@ -3,6 +3,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
+#define FPS_Z_OFFSET 1.f
+#define FPS_Y_OFFSET 0.f
+#define TPS_Z_OFFSET -15.f
+#define TPS_Y_OFFSET 2.5f
+
 Application &Application::instance = *(new Application());
 
 // Process keyboard input
@@ -31,20 +36,26 @@ void Application::processKeyboardInput() {
   // Player actions
   if (scene != nullptr) {
     Player *player = scene->getPlayer();
+
+    // Movement
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+      player->moveInPlane(Direction::Left);
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+      player->moveInPlane(Direction::Right);
+    }
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-      player->updateSpeed(0.5f * getDeltaTime());
+      player->moveInPlane(Direction::Up);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-      player->updateSpeed(-0.275f * getDeltaTime());
+      player->moveInPlane(Direction::Down);
     }
-    if(glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+
+    // Fire
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
       double now = glfwGetTime();
-      if (now >= lastFireTime + fireCooldown) {
-        scene->addObject(new Torpedo{
-            1000,
-            player->getPosition() + 3.f * QuatHelpers::getForward(player->getOrientation()),
-            player->getOrientation()
-        });
+      if (now >= lastFireTime + PLAYER_FIRE_COOLDOWN) {
+        scene->createTorpedo(player->getPosition(), player->getTargetDirection());
         lastFireTime = now;
       }
     }
@@ -56,17 +67,11 @@ void Application::processMouseInput(GLFWwindow *, double posX, double posY) {
   if (scene != nullptr) {
     Player *player = scene->getPlayer();
     static double lastX = posX, lastY = posY;
-
-    float offsetX = float(posX - lastX) * sensitivity;
-    float offsetY = float(posY - lastY) * sensitivity;
-
+    float offsetX = float(posX - lastX) * MOUSE_SENSITIVITY;
+    float offsetY = float(posY - lastY) * MOUSE_SENSITIVITY;
     lastX = posX;
     lastY = posY;
-
-    glm::quat qPitch = glm::angleAxis(glm::radians(-offsetY), glm::vec3(1, 0, 0));
-    glm::quat qYaw = glm::angleAxis(glm::radians(offsetX), glm::vec3(0, 1, 0));
-
-    player->rotate(qPitch * qYaw);
+    player->rotateTarget(-offsetY, offsetX);
   }
 }
 
@@ -80,15 +85,7 @@ void Application::update() {
   processKeyboardInput();
 
   // update camera position and orientation
-  if (scene != nullptr) {
-    Player *player = scene->getPlayer();
-    auto orientation = player->getOrientation();
-    glm::vec3 cameraOffset = cameraPosition == CameraPosition::FirstPerson ?
-        + 1.f * QuatHelpers::getForward(orientation) + QuatHelpers::getUp(orientation) * 2.5f :
-        - 10.f * QuatHelpers::getForward(orientation) + QuatHelpers::getUp(orientation) * 2.5f;
-    camera.updatePosition(player->getPosition() + cameraOffset);
-    camera.setOrientation(player->getOrientation());
-  }
+  this->updateCameraPosition();
 }
 
 // Get time passed from previous render
@@ -105,8 +102,36 @@ unsigned Application::getScore() const {
   return score;
 }
 
+void Application::updateScore(unsigned delta) {
+  score += delta;
+}
+
 glm::ivec2 Application::getWindowSize() const {
   glm::ivec2 size;
   glfwGetWindowSize(window, &size.x, &size.y);
   return size;
+}
+
+void Application::updateCameraPosition() {
+  if (scene != nullptr) {
+    Player *player = scene->getPlayer();
+    auto orientation = player->getTargetDirection();
+    glm::vec3 cameraOffset = cameraPosition == CameraPosition::FirstPerson
+                                 ? FPS_Z_OFFSET * QuatHelpers::getForward(orientation) +
+                                       QuatHelpers::getUp(orientation) * FPS_Y_OFFSET
+                                 : TPS_Z_OFFSET * QuatHelpers::getForward(orientation) +
+                                       QuatHelpers::getUp(orientation) * TPS_Y_OFFSET;
+    camera.updatePosition(player->getPosition() + cameraOffset);
+    camera.setOrientation(player->getTargetDirection());
+  }
+}
+
+glm::vec2 Application::calculateCrosshairOffset() {
+  glm::vec2 windowSize = this->getWindowSize();
+  switch (cameraPosition) {
+  case CameraPosition::FirstPerson:
+    return glm::vec2(0.f, -0.02f * windowSize.y);
+  case CameraPosition::ThirdPerson:
+    return glm::vec2(0.f, -0.06f * windowSize.y);
+  }
 }

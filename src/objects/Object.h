@@ -17,12 +17,18 @@ protected:
   const glm::quat modelRotation;
   std::tuple<float, float> speedLimit;
 
+  // Orientation deltas used in pseudo-object space
+  float deltaPitch = 0.f;
+  float deltaYaw = 0.f;
+  float deltaRoll = 0.f;
+
 public:
   // Constructor
-  Object(const Model *model, unsigned health, glm::vec3 position, float bboxSize, float scale, std::tuple<float, float> speedLimit,
-      glm::quat modelRotation = glm::angleAxis(0.f, glm::vec3(1, 0, 0)),
+  Object(const Model *model, unsigned health, glm::vec3 position, float bboxSize, float scale,
+         std::tuple<float, float> speedLimit, glm::quat modelRotation = glm::quat(1.f, 0.f, 0.f, 0.f),
          float yaw = 0, float pitch = 0, float roll = 0)
-      : model(model), health(health), position(position), bboxSize(bboxSize), scale(scale), orientation(), modelRotation(modelRotation), speedLimit(std::move(speedLimit)) {
+      : model(model), health(health), position(position), bboxSize(bboxSize), scale(scale), orientation(),
+        modelRotation(modelRotation), speedLimit(std::move(speedLimit)) {
 
     glm::quat qPitch = glm::angleAxis(glm::radians(pitch), glm::vec3(1, 0, 0));
     glm::quat qYaw = glm::angleAxis(glm::radians(yaw), glm::vec3(0, 1, 0));
@@ -32,9 +38,10 @@ public:
   }
 
   // Constructor
-  Object(const Model *model, unsigned health, glm::vec3 position, float bboxSize, float scale, std::tuple<float, float> speedLimit,
-         glm::quat orientation, glm::quat modelRotation)
-      : model(model), health(health), position(position), bboxSize(bboxSize), scale(scale), orientation(orientation), modelRotation(modelRotation), speedLimit(std::move(speedLimit)) {
+  Object(const Model *model, unsigned health, glm::vec3 position, float bboxSize, float scale,
+         std::tuple<float, float> speedLimit, glm::quat orientation, glm::quat modelRotation)
+      : model(model), health(health), position(position), bboxSize(bboxSize), scale(scale), orientation(orientation),
+        modelRotation(modelRotation), speedLimit(std::move(speedLimit)) {
     SPDLOG_INFO("Created");
   }
 
@@ -62,8 +69,14 @@ public:
   // Get object position
   glm::vec3 getPosition() const;
 
+  // Set object position
+  void setPosition(glm::vec3 aPosition);
+
   // Get object orientation
   glm::quat getOrientation() const;
+
+  // Set object orientation
+  void setOrientation(glm::quat anOrientation);
 
   // Get health
   unsigned getHealth() const;
