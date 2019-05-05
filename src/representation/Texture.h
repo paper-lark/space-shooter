@@ -4,6 +4,7 @@
 #include "TextureMapType.h"
 #include <glad/glad.h>
 #include <string>
+#include <vector>
 
 class Texture {
   GLuint ID;              // texture object ID

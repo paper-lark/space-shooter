@@ -1,6 +1,7 @@
 # Space Shooter
 
 Space shooter is a school project implemented with OpenGl 3.
+Tested on macOS 10.14 and Ubuntu 18.04.
 
 ## Dependencies
 - [PkgConfig](https://cmake.org/cmake/help/v3.0/module/FindPkgConfig.html)

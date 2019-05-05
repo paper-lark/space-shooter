@@ -33,9 +33,9 @@ Scene::Scene() {
 
   // create skybox
   std::vector<std::string> textures_faces = {
-      "assets/Skybox/red2/right.png", "assets/Skybox/red2/left.png",
-      "assets/Skybox/red2/top.png",   "assets/Skybox/red2/bot.png",
-      "assets/Skybox/red2/front.png", "assets/Skybox/red2/back.png"};
+      "assets/Skybox/right.png", "assets/Skybox/left.png",
+      "assets/Skybox/top.png",   "assets/Skybox/bot.png",
+      "assets/Skybox/front.png", "assets/Skybox/back.png"};
   skybox = new Skybox{textures_faces, Shader("skybox/vertex.glsl", "skybox/fragment.glsl")};
 }
 

@@ -39,11 +39,23 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory "${PROJECT_SOURCE_DIR}/assets" "${PROJECT_BINARY_DIR}/assets")
 
 # Link libraries
-target_link_libraries(${PROJECT_NAME}
+if (APPLE)
+    target_link_libraries(${PROJECT_NAME}
         ${OPENGL_LIBRARIES}
         ${GLFW_LINK_LIBRARIES}
         ${ASSIMP_LINK_LIBRARIES}
         ${FREETYPE_LIBRARIES}
-        ${CMAKE_DL_LIBS} # TODO: dl?
-)
+        ${CMAKE_DL_LIBS}
+    )
+elseif(UNIX)
+    target_link_libraries(${PROJECT_NAME}
+        ${OPENGL_LIBRARIES}
+        ${GLFW_LIBRARIES}
+        ${ASSIMP_LIBRARIES}
+        ${FREETYPE_LIBRARIES}
+        ${CMAKE_DL_LIBS}
+    )
+else()
+    error("Unsupported system: ${CMAKE_SYSTEM}")
+endif()
 
