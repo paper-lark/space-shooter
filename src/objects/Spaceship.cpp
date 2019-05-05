@@ -4,17 +4,21 @@
 
 #define FIRE_COOLDOWN 3.f
 
-Model *Spaceship::spaceshipModel = nullptr;
+Model *Spaceship::models = nullptr;
 
 void Spaceship::init() {
   SPDLOG_INFO("Loading model...");
-  spaceshipModel = new Model("assets/ARC-170/Arc170.obj");
+  models = new Model[SPACESHIP_MODEL_COUNT]{
+      Model("assets/Spaceship [1]/Arc170.obj"),
+      Model("assets/Spaceship [2]/f.obj"),
+      Model("assets/Spaceship [3]/SS1.obj"),
+  };
 }
 
 void Spaceship::release() {
-  if (spaceshipModel != nullptr) {
-    delete spaceshipModel;
-    spaceshipModel = nullptr;
+  if (models != nullptr) {
+    delete [] models;
+    models = nullptr;
     SPDLOG_INFO("Model released");
   }
 }

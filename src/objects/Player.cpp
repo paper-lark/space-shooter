@@ -1,9 +1,15 @@
 #include "Player.h"
+#include "../configuration.h"
 #include "../utils/Helpers.h"
 #include "Spaceship.h"
 #include <spdlog/spdlog.h>
 
+#ifdef GOD_MODE
+#define MAX_TARGET_VIEW_ANGLE 360.f
+#else
 #define MAX_TARGET_VIEW_ANGLE 30.f
+#endif
+
 #define TILT_SPEED 30.f
 #define MAX_ROLL_TILT_ANGLE 15.f
 #define MAX_PITCH_TILT_ANGLE 5.f
@@ -13,7 +19,7 @@ Model *Player::spaceshipModel = nullptr;
 
 void Player::init() {
   SPDLOG_INFO("Loading model...");
-  spaceshipModel = new Model("assets/ARC-170/Arc170.obj");
+  spaceshipModel = new Model("assets/Spaceship [1]/Arc170.obj");
 }
 
 void Player::release() {

@@ -6,13 +6,17 @@ layout (location = 2) in vec2 aTexCoords;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-out vec2 texCoords;
-out vec3 Normal;
-out vec3 FragPos;
+
+
+out VS_OUT {
+	vec2 texCoords;
+	vec3 normal;
+	vec3 fragPos;
+} vs_out;
 
 void main() {
 	gl_Position = projection * view * model * vec4(aPos, 1.0);
-	texCoords = aTexCoords;
-	Normal = mat3(transpose(inverse(model))) * aNormal;
-	FragPos = vec3(model * vec4(aPos, 1.0));
+	vs_out.texCoords = aTexCoords;
+	vs_out.normal = mat3(transpose(inverse(model))) * aNormal;
+	vs_out.fragPos = vec3(model * vec4(aPos, 1.0));
 }

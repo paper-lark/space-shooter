@@ -5,7 +5,7 @@ Model *Star::starModel = nullptr;
 
 void Star::init() {
   SPDLOG_INFO("Loading model...");
-  starModel = new Model("assets/Star/Mercury 1K.obj");
+  starModel = new Model("assets/Star [1]/Mercury 1K.obj");
 }
 
 void Star::release() {

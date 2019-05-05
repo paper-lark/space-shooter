@@ -7,15 +7,16 @@
 
 class Object {
 protected:
-  const Model *model;
+  Model *model;
   unsigned health;
   glm::vec3 position;
   float bboxSize;
   float scale;
   glm::quat orientation;
   float speed = 0.f;
-  const glm::quat modelRotation;
-  std::tuple<float, float> speedLimit;
+  glm::quat modelRotation;
+  std::tuple<float, float> speedLimit; // FIXME: refactor speed: should be the same for all track objects
+  float timeSinceDeath = 0.f;
 
   // Orientation deltas used in pseudo-object space
   float deltaPitch = 0.f;
@@ -24,7 +25,7 @@ protected:
 
 public:
   // Constructor
-  Object(const Model *model, unsigned health, glm::vec3 position, float bboxSize, float scale,
+  Object(Model *model, unsigned health, glm::vec3 position, float bboxSize, float scale,
          std::tuple<float, float> speedLimit, glm::quat modelRotation = glm::quat(1.f, 0.f, 0.f, 0.f),
          float yaw = 0, float pitch = 0, float roll = 0)
       : model(model), health(health), position(position), bboxSize(bboxSize), scale(scale), orientation(),
@@ -38,7 +39,7 @@ public:
   }
 
   // Constructor
-  Object(const Model *model, unsigned health, glm::vec3 position, float bboxSize, float scale,
+  Object(Model *model, unsigned health, glm::vec3 position, float bboxSize, float scale,
          std::tuple<float, float> speedLimit, glm::quat orientation, glm::quat modelRotation)
       : model(model), health(health), position(position), bboxSize(bboxSize), scale(scale), orientation(orientation),
         modelRotation(modelRotation), speedLimit(std::move(speedLimit)) {
@@ -62,6 +63,9 @@ public:
   // Update speed by a specified delta
   // TODO: incapsulate acceleration
   void updateSpeed(float deltaSpeed);
+
+  // Get time since death for object
+  float getTimeSinceDeath() const;
 
   // Set object rotation
   glm::quat rotate(glm::quat rotation);

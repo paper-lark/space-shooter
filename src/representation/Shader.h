@@ -9,9 +9,13 @@ class Shader {
   // shader program ID
   GLuint ID;
 
+  void handleShaderErrors();
+
 public:
   // constructor
   Shader(const std::string &vertexPath, const std::string &fragmentPath);
+  Shader(const std::string &vertexPath, const std::string &geometryPath,
+         const std::string &fragmentPath);
 
   // use shader program
   void use();

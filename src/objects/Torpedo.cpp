@@ -5,7 +5,7 @@ Model *Torpedo::torpedoModel = nullptr;
 
 void Torpedo::init() {
   SPDLOG_INFO("Loading model...");
-  torpedoModel = new Model("assets/Torpedo/missile.obj");
+  torpedoModel = new Model("assets/Torpedo [1]/missile.obj");
 }
 
 void Torpedo::release() {

@@ -5,20 +5,22 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 
-#define CHECK_MESH(mesh)                                                                                               \
-  if (mesh->mNormals == nullptr) {                                                                                     \
-    throw std::runtime_error("Missing normals on the mesh");                                                           \
-  } else if (mesh->mTextureCoords == nullptr) {                                                                        \
-    throw std::runtime_error("Missing texture coordinates on the mesh");                                               \
+#define CHECK_MESH(mesh)                                                                           \
+  if (mesh->mNormals == nullptr) {                                                                 \
+    throw std::runtime_error("Missing normals on the mesh");                                       \
+  } else if (mesh->mTextureCoords == nullptr) {                                                    \
+    throw std::runtime_error("Missing texture coordinates on the mesh");                           \
   }
 
 void Model::loadModel(const string &path) {
   SPDLOG_INFO("Loading model: {}", path);
   Assimp::Importer importer;
-  const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+  const aiScene *scene = importer.ReadFile(path, unsigned(aiProcess_Triangulate) |
+                                                     aiProcess_FlipUVs | aiProcess_GenNormals);
 
-  if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-    throw std::runtime_error(std::string("Failed to load model: ").append(importer.GetErrorString()));
+  if (!scene || scene->mFlags & unsigned(AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode) {
+    throw std::runtime_error(
+        std::string("Failed to load model: ").append(importer.GetErrorString()));
   }
   directory = path.substr(0, path.find_last_of('/'));
   processNode(scene->mRootNode, scene);
@@ -46,7 +48,8 @@ Mesh Model::processMesh(const aiMesh *mesh, const aiScene *scene) {
   for (unsigned i = 0; i < mesh->mNumVertices; i++) {
     CHECK_MESH(mesh);
     Vertex vertex(glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z),
-                  glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z), glm::vec2(0.f, 0.f));
+                  glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z),
+                  glm::vec2(0.f, 0.f));
     if (mesh->mTextureCoords[0]) {
       vertex.textureCoords = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
     }
@@ -64,15 +67,18 @@ Mesh Model::processMesh(const aiMesh *mesh, const aiScene *scene) {
   // process mesh material
   if (mesh->mMaterialIndex >= 0) {
     aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
-    vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, TextureMapType::Diffuse);
-    vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, TextureMapType::Specular);
+    vector<Texture> diffuseMaps =
+        loadMaterialTextures(material, aiTextureType_DIFFUSE, TextureMapType::Diffuse);
+    vector<Texture> specularMaps =
+        loadMaterialTextures(material, aiTextureType_SPECULAR, TextureMapType::Specular);
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
   }
   return Mesh(vertices, indices, textures);
 }
 
-vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, TextureMapType typeName) {
+vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type,
+                                            TextureMapType typeName) {
   vector<Texture> textures;
   unsigned textureCount = mat->GetTextureCount(type);
 

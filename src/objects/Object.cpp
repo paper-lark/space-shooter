@@ -23,6 +23,7 @@ void Object::draw(Shader &shader) const {
   shader.use();
   shader.setMatrix("model", this->getObjectModelMatrix());
   shader.setUint("health", health);
+  shader.setFloat("timeSinceDeath", timeSinceDeath);
   model->draw(shader);
 }
 
@@ -32,6 +33,11 @@ void Object::update(float deltaTime) {
 
   // move object according to its speed
   position += speed * deltaTime * QuatHelpers::getForward(orientation);
+
+  // update time since death if object is destroyed
+  if (health == 0) {
+    timeSinceDeath += deltaTime;
+  }
 }
 
 glm::vec3 Object::getPosition() const {
@@ -57,4 +63,8 @@ unsigned Object::getHealth() const {
 glm::quat Object::rotate(glm::quat rotation) {
   orientation = glm::normalize(orientation * rotation);
   return orientation;
+}
+
+float Object::getTimeSinceDeath() const {
+  return timeSinceDeath;
 }

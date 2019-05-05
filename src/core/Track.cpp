@@ -46,14 +46,13 @@ std::vector<Object *> Track::getObjects() {
 }
 
 unsigned Track::removeDestroyed() {
-  float currentTime = glfwGetTime();
   // find destroyed track objects
   unsigned destroyed = 0;
   objects.erase(std::remove_if(objects.begin(), objects.end(),
-                               [&destroyed, currentTime, this](Object *obj) {
+                               [&destroyed, this](Object *obj) {
                                  if (!obj->isAlive()) {
                                    destroyed++;
-                                   destructedObjects.emplace_back(obj, currentTime);
+                                   destructedObjects.push_back(obj);
                                    return true;
                                  }
                                  return false;
@@ -62,11 +61,11 @@ unsigned Track::removeDestroyed() {
 
   // remove outdated destroyed objects
   destructedObjects.erase(std::remove_if(destructedObjects.begin(), destructedObjects.end(),
-                                         [currentTime](std::pair<Object *, float> p) {
+                                         [](Object *obj) {
                                            bool shouldDelete =
-                                               currentTime > DELETE_DELAY + std::get<1>(p);
+                                               obj->getTimeSinceDeath() > DELETE_DELAY;
                                            if (shouldDelete) {
-                                             delete std::get<0>(p);
+                                             delete obj;
                                            }
                                            return shouldDelete;
                                          }),
@@ -89,12 +88,12 @@ void Track::update(float deltaTime) {
 
   // update destroyed objects
   std::for_each(destructedObjects.begin(), destructedObjects.end(),
-                [deltaTime](std::pair<Object *, float> p) { std::get<0>(p)->update(deltaTime); });
+                [deltaTime](Object *obj) { obj->update(deltaTime); });
 }
 
 void Track::draw(Shader shader) {
   std::for_each(objects.cbegin(), objects.cend(),
                 [&shader](const Object *obj) { obj->draw(shader); });
   std::for_each(destructedObjects.cbegin(), destructedObjects.cend(),
-                [&shader](const std::pair<Object *, float> p) { std::get<0>(p)->draw(shader); });
+                [&shader](const Object *obj) { obj->draw(shader); });
 }

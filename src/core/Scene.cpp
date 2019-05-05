@@ -1,9 +1,9 @@
 #include "Scene.h"
+#include "../configuration.h"
+#include "../objects/Asteroid.h"
 #include "../objects/Spaceship.h"
 #include "../objects/Torpedo.h"
 #include "Application.h"
-#include <chrono>
-#include <random>
 #include <spdlog/spdlog.h>
 
 #define MAX_POINT_LIGHT_COUNT 4
@@ -95,14 +95,16 @@ void Scene::draw(Camera &camera) {
   }
   player->draw(objShader);
 
-  // draw light sources
-  lightShader.use();
-  lightShader.setMatrix("view", camera.getViewMatrix());
-  lightShader.setMatrix("projection", camera.getProjectionMatrix());
+  // draw stars
+  simpleShader.use();
+  simpleShader.setMatrix("view", camera.getViewMatrix());
+  simpleShader.setMatrix("projection", camera.getProjectionMatrix());
   for (Star *star : stars) {
-    lightShader.setMatrix("model", star->getObjectModelMatrix());
-    star->draw(lightShader);
+    star->draw(simpleShader);
   }
+
+  // draw particles
+  particles.draw(simpleShader);
 
   // draw skybox
   skybox->draw(camera);
@@ -136,6 +138,10 @@ unsigned Scene::update(float deltaTime) {
   std::for_each(objects.begin(), objects.end(),
                 [deltaTime](Object *obj) { obj->update(deltaTime); });
   std::for_each(stars.begin(), stars.end(), [deltaTime](Object *obj) { obj->update(deltaTime); });
+
+  // update particle system centered on the player
+  particles.setPosition(player->getPosition() + WARP_EFFECT_OFFSET);
+  particles.update(deltaTime);
 
   // check borders
   this->checkBorders();
@@ -200,40 +206,63 @@ void Scene::checkBorders() {
 }
 
 void Scene::addNewObjects(float deltaTime) {
-  static float sinceLastTrackObject = 0;
-  static float sinceLastStar = 0;
-  static std::default_random_engine generator{
-      static_cast<unsigned>(std::chrono::system_clock::now().time_since_epoch().count())};
   sinceLastStar += deltaTime;
   sinceLastTrackObject += deltaTime;
 
   if (sinceLastTrackObject > OBJECT_CREATION_TIMEOUT) {
-    // create track object
-    unsigned numberOfTracks = TRACKS_PER_DIRECTION * TRACKS_PER_DIRECTION;
-    std::uniform_int_distribution<unsigned> distribution(0, numberOfTracks - 1);
-    unsigned trackNumber = distribution(generator);
-    this->addObjectOnTrack(new Spaceship{100}, trackNumber);
+    this->addTrackObject();
     sinceLastTrackObject = 0;
-    SPDLOG_INFO("Created track object at {}", trackNumber);
   }
 
   if (sinceLastStar > STAR_CREATION_TIMEOUT) {
-    // create star
-    float planeLimit = TRACKS_PER_DIRECTION * TRACK_SIZE;
-    int spread = 2;
-    int offset = 3;
-
-    std::uniform_real_distribution<float> distribution(-spread * planeLimit, spread * planeLimit);
-
-    float xRand = distribution(generator);
-    float yRand = distribution(generator);
-    float xPos = xRand > 0 ? xRand + (1 + offset) * planeLimit : xRand - offset * planeLimit;
-    float yPos = yRand > 0 ? yRand + (1 + offset) * planeLimit : yRand - offset * planeLimit;
-
-    stars.push_back(new Star{1000000, glm::vec3(xPos, yPos, -SPAWN_FIELD_DEPTH * 2)});
+    this->addStarObject();
     sinceLastStar = 0;
-    SPDLOG_INFO("Created star at ({}, {})", xPos, yPos);
   }
+}
+
+void Scene::addTrackObject() {
+  unsigned numberOfTracks = TRACKS_PER_DIRECTION * TRACKS_PER_DIRECTION;
+  std::uniform_int_distribution<unsigned> trackDistribution(0, numberOfTracks - 1);
+  std::uniform_int_distribution<unsigned> typeDistribution(0, 4);
+
+  unsigned trackNumber = trackDistribution(generator);
+  unsigned type = typeDistribution(generator);
+  SPDLOG_INFO("Generating track object type <{}>", type);
+
+  switch (type) {
+  case 0:
+    this->addObjectOnTrack(new Spaceship{100}, trackNumber);
+    break;
+  case 1:
+    this->addObjectOnTrack(new Spaceship{200}, trackNumber);
+    break;
+  case 2:
+    this->addObjectOnTrack(new Spaceship{300}, trackNumber);
+    break;
+  case 3:
+    this->addObjectOnTrack(new Asteroid{100}, trackNumber);
+    break;
+  default:
+    this->addObjectOnTrack(new Asteroid{200}, trackNumber);
+    break;
+  }
+  SPDLOG_INFO("Created track object at {}", trackNumber);
+}
+
+void Scene::addStarObject() {
+  float planeLimit = TRACKS_PER_DIRECTION * TRACK_SIZE;
+  int spread = 2;
+  int offset = 3;
+
+  std::uniform_real_distribution<float> distribution(-spread * planeLimit, spread * planeLimit);
+
+  float xRand = distribution(generator);
+  float yRand = distribution(generator);
+  float xPos = xRand > 0 ? xRand + (1 + offset) * planeLimit : xRand - offset * planeLimit;
+  float yPos = yRand > 0 ? yRand + (1 + offset) * planeLimit : yRand - offset * planeLimit;
+
+  stars.push_back(new Star{1000000, glm::vec3(xPos, yPos, -SPAWN_FIELD_DEPTH * 2)});
+  SPDLOG_INFO("Created star at ({}, {})", xPos, yPos);
 }
 
 unsigned Scene::processCollisions() {

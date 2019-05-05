@@ -9,7 +9,7 @@
 
 class Track {
   std::vector<Object *> objects;
-  std::vector<std::pair<Object *, float>> destructedObjects;
+  std::vector<Object *> destructedObjects;
   glm::vec3 trackStart;
   glm::vec3 trackEnd;
 

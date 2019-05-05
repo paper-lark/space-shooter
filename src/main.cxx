@@ -7,6 +7,7 @@
 #include "core/Camera.h"
 #include "core/HUD.h"
 #include "core/Scene.h"
+#include "objects/Asteroid.h"
 #include "objects/Player.h"
 #include "objects/Spaceship.h"
 #include "objects/Star.h"
@@ -29,7 +30,6 @@
 #define WINDOW_WIDTH 800
 #define WINDOW_TITLE "OpenGL Introduction"
 #define GAME_OVER_DELAY 5.f
-//#define GOD_MODE
 
 // Initialize GLFW
 void initializeGLFW() {
@@ -152,6 +152,7 @@ int main(int, char **) {
   Player::init();
   Star::init();
   Torpedo::init();
+  Asteroid::init();
 
   // Start game loop
   SPDLOG_INFO("Starting game loop...");
@@ -163,6 +164,7 @@ int main(int, char **) {
   Player::release();
   Star::release();
   Torpedo::release();
+  Asteroid::release();
   glfwTerminate();
   return 0;
 }

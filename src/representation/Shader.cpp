@@ -45,6 +45,30 @@ Shader::Shader(const std::string &vertexPath, const std::string &fragmentPath) {
   glDeleteShader(fragmentShader);
 
   // check for errors
+  this->handleShaderErrors();
+}
+
+Shader::Shader(const std::string &vertexPath, const std::string &geometryPath,
+               const std::string &fragmentPath) {
+  GLuint vertexShader = loadShader(GL_VERTEX_SHADER, vertexPath);
+  GLuint fragmentShader = loadShader(GL_FRAGMENT_SHADER, fragmentPath);
+  GLuint geometryShader = loadShader(GL_GEOMETRY_SHADER, geometryPath);
+
+  // create shader program
+  this->ID = glCreateProgram();
+  glAttachShader(this->ID, vertexShader);
+  glAttachShader(this->ID, geometryShader);
+  glAttachShader(this->ID, fragmentShader);
+  glLinkProgram(this->ID);
+  glDeleteShader(vertexShader);
+  glDeleteShader(fragmentShader);
+  glDeleteShader(geometryShader);
+
+  // check for errors
+  this->handleShaderErrors();
+}
+
+void Shader::handleShaderErrors() {
   GLint success;
   glGetProgramiv(this->ID, GL_LINK_STATUS, &success);
   if (success != GL_TRUE) {

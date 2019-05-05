@@ -20,9 +20,9 @@ public:
   static void release();
 
   // Constructor
-  Player(unsigned health, const glm::vec3 position, float yaw = 0.f, float pitch = 0.f,
+  explicit Player(unsigned health, const glm::vec3 position, float yaw = 0.f, float pitch = 0.f,
          float roll = 0.f)
-      : Object(spaceshipModel, health, position, 3.f, 0.005f, std::make_tuple(0.f, 0.f),
+      : Object(spaceshipModel, health, position, 2.5f, 0.005f, std::make_tuple(0.f, 0.f),
                glm::quat(1.f, 0.f, 0.f, 0.f), yaw, pitch, roll),
         targetPitch(pitch), targetYaw(yaw) {}
 
