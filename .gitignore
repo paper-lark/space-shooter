@@ -2,3 +2,6 @@ cmake-build-debug/
 02_task1.pdf
 .idea/
 assets/
+readme.txt
+*.png
+*.jpg

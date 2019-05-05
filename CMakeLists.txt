@@ -31,10 +31,6 @@ include_directories(${ASSIMP_INCLUDE_DIRS})
 find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
 
-# Boost
-#find_package(BOOST REQUIRED)
-#include_directories(${BOOST_INCLUDE_DIR})
-
 # Include provided libraries
 include_directories("dependencies/include")
 
